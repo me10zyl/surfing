@@ -6,9 +6,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexSelector extends Selector {
+    private Integer group;
 
     public RegexSelector(String selectPattern) {
         super(selectPattern);
+    }
+
+    public RegexSelector(String selectPattern, int group) {
+        super(selectPattern);
+        this.group = group;
     }
 
     @Override
@@ -17,7 +23,11 @@ public class RegexSelector extends Selector {
         Matcher matcher = pattern.matcher(text);
         String group = null;
         while (matcher.find()) {
-            group = matcher.group();
+            if(this.group != null){
+                group = matcher.group(this.group);
+            }else{
+                group = matcher.group();
+            }
         }
         return group;
     }
@@ -28,7 +38,12 @@ public class RegexSelector extends Selector {
         Matcher matcher = pattern.matcher(text);
         List<String> groups = new ArrayList<>();
         while (matcher.find()) {
-            final String group = matcher.group();
+            final String group;
+            if(this.group != null){
+                group = matcher.group(this.group);
+            }else{
+                 group = matcher.group();
+            }
             groups.add(group);
         }
         return groups;

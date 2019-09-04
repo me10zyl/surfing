@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SurfHttpRequest {
+    private String method;
     private String url;
     private Map<String, String> headers = new HashMap<>();
     private String body;
     private Map<String, String> params = new HashMap<>();
+    private Map<String, String> bodyParams = new HashMap<>();
     private HeaderGenerator headerGenerator;
 
     public void setHeaderGenerator(HeaderGenerator headerGenerator) {
@@ -25,8 +27,20 @@ public class SurfHttpRequest {
         return newHeaders;
     }
 
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     public Map<String, String> getParams() {
         return params;
+    }
+
+    public Map<String, String> getBodyParams() {
+        return bodyParams;
     }
 
     public String getBody() {
@@ -45,11 +59,22 @@ public class SurfHttpRequest {
         this.url = url;
     }
 
+    public String getFullUrl(){
+        if(getUrl().startsWith("//")){
+            return "http:" + getUrl();
+        }
+        return getUrl();
+    }
+
     public void addHeader(String key, String value){
         headers.put(key, value);
     }
 
     public void addParams(String name, String value){
-        headers.put(name, value);
+        params.put(name, value);
+    }
+
+    public void addBodyParams(String name, String value){
+        bodyParams.put(name, value);
     }
 }

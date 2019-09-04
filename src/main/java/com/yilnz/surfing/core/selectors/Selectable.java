@@ -11,4 +11,6 @@ public interface Selectable {
     Selectable select(Selector selector);
 
     List<Selectable> nodes();
+
+    Integer getInt();
 }

@@ -6,4 +6,9 @@ public abstract class AbstractSelectable implements Selectable {
     public String toString() {
         return this.get();
     }
+
+    @Override
+    public Integer getInt() {
+        return Integer.parseInt(this.get());}
+
 }

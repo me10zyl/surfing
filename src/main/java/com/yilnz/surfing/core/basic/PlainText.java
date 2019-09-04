@@ -21,6 +21,9 @@ public class PlainText extends AbstractSelectable {
 
     @Override
     public String get() {
+        if(this.text == null){
+            return null;
+        }
         if(this.text.size() == 1){
             return text.get(0);
         }

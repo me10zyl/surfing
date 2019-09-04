@@ -5,10 +5,7 @@ import com.yilnz.surfing.core.basic.Page;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -17,55 +14,70 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SurfHttpClient {
 
     private Logger logger = LoggerFactory.getLogger(SurfHttpClient.class);
 
     public Page post(SurfHttpRequest request){
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-        final CloseableHttpClient closeableHttpClient = builder.build();
-        Page page = new Page();
-        try {
-            final HttpPost requests = new HttpPost(request.getUrl());
-            String body = request.getBody();
-            if(body == null){
-                body = getParamsStr(request);
-            }
-            requests.setEntity(new StringEntity(body));
-            request(page,closeableHttpClient, requests);
-        } catch (IOException e) {
-           logger.error("surf http client post error", e);
-        }
-        return page;
+        request.setMethod("POST");
+        return request(request);
     }
 
     public Page get(SurfHttpRequest request){
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-        final CloseableHttpClient closeableHttpClient = builder.build();
-        Page page = new Page();
-        try {
-            String paramsStr = getParamsStr(request);
-            final HttpGet requests = new HttpGet(request.getUrl() + "?" + paramsStr);
-            request(page, closeableHttpClient, requests);
-        } catch (IOException e) {
-            logger.error("surf http client get error", e);
-        }
-        return page;
+        request.setMethod("GET");
+        return request(request);
     }
 
-    private String getParamsStr(final SurfHttpRequest request) throws IOException {
+    public Page request(SurfHttpRequest request){
+        final HttpClientBuilder builder = HttpClientBuilder.create();
+        final CloseableHttpClient closeableHttpClient = builder.build();
+
+        Page page = new Page();
+        page.setUrl(request.getUrl());
+        try {
+            final HttpEntityEnclosingRequestBase requests = new HttpEntityEnclosingRequestBase() {
+                @Override
+                public String getMethod() {
+                    return request.getMethod().toUpperCase();
+                }
+            };
+
+            String url = request.getUrl();
+            if(!request.getParams().isEmpty()){
+                url += "?" + getParamsStr(request.getParams());
+            }
+            requests.setURI(URI.create(url));
+            String body = request.getBody();
+            if(body == null && !request.getBodyParams().isEmpty()){
+                body = getParamsStr(request.getBodyParams());
+                requests.setEntity(new StringEntity(body));
+            }
+            requestInternal(page,closeableHttpClient, requests);
+        } catch (IOException e) {
+            logger.error("surf http client error", e);
+        }
+        return page;
+
+    }
+
+    private String getParamsStr(final Map<String, String> params) throws IOException {
         final List<NameValuePair> formparams = new ArrayList<>();
-        request.getParams().forEach((e,v)->{
+        params.forEach((e,v)->{
             formparams.add(new BasicNameValuePair(e, v));
         });
         return EntityUtils.toString(new UrlEncodedFormEntity(formparams, "UTF-8"));
     }
 
-    private void request(Page page, CloseableHttpClient closeableHttpClient, HttpUriRequest requests) throws IOException {
+    private void requestInternal(Page page, CloseableHttpClient closeableHttpClient, HttpUriRequest requests) throws IOException {
         final CloseableHttpResponse response = closeableHttpClient.execute(requests);
         final HttpEntity entity = response.getEntity();
         final InputStream inputStream = entity.getContent();
