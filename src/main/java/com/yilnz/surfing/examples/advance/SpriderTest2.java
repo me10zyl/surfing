@@ -1,8 +1,6 @@
 package com.yilnz.surfing.examples.advance;
 
-import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfPageProcessor;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.*;
 import com.yilnz.surfing.core.basic.Page;
 
 public class SpriderTest2 {
@@ -11,6 +9,11 @@ public class SpriderTest2 {
 		request.setUrl("http://www.baidu.com");
 		request.setMethod("GET");
 		SurfSprider.create().addRequest(request).setProcessor(new SurfPageProcessor() {
+			@Override
+			public Site getSite() {
+				return Site.me();
+			}
+
 			@Override
 			public void process(Page page) {
 				System.out.println(page.getHtml().get());

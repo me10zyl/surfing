@@ -13,6 +13,15 @@ public class SurfHttpRequest {
     private Map<String, String> params = new HashMap<>();
     private Map<String, String> bodyParams = new HashMap<>();
     private HeaderGenerator headerGenerator;
+    private Object data;
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
 
     public void setHeaderGenerator(HeaderGenerator headerGenerator) {
         this.headerGenerator = headerGenerator;

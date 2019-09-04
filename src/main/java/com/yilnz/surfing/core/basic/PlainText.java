@@ -27,13 +27,33 @@ public class PlainText extends AbstractSelectable {
         if(this.text.size() == 1){
             return text.get(0);
         }
+        if(this.text.size() == 0){
+            return null;
+        }
         return text.toString();
     }
 
     @Override
     public Selectable select(Selector selector) {
         final List<String> strings = selector.selectList(this.text.get(0));
-        return new PlainText(strings);
+        final List<Selector> otherSelectors = selector.getOtherSelectors();
+        List<String> lastString = new ArrayList<>();
+        for (String string : strings) {
+            List<String> finalLastString = lastString;
+            otherSelectors.forEach(e->{
+                if("AND".equals(e.getLogicType())){
+                    finalLastString.addAll(e.selectList(string));
+                } else if ("OR".equals(e.getLogicType())) {
+                    finalLastString.add(string);
+                    finalLastString.addAll(e.selectList(string));
+                }
+            });
+        }
+
+        if(otherSelectors.size() == 0){
+            lastString = strings;
+        }
+        return new PlainText(lastString);
     }
 
     @Override

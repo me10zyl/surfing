@@ -3,6 +3,7 @@ package com.yilnz.surfing.core;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
+import com.yilnz.surfing.core.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ public class SurfSprider {
 	private int threadnum;
 	private static final Logger logger = LoggerFactory.getLogger(SurfSprider.class);
 	private SurfPageProcessor pageProcessor;
+	private List<Tool> tools = new ArrayList<>();
 
 	private SurfSprider() {
 		this.requests = new ArrayList<>();
@@ -24,6 +26,20 @@ public class SurfSprider {
 
 	public static SurfSprider create() {
 		return new SurfSprider();
+	}
+
+	public void setTools(List<Tool> tools) {
+		this.tools = tools;
+	}
+
+	public static SurfSprider create(Tool... tool){
+		final SurfSprider surfSprider = new SurfSprider();
+		List<Tool> tools = new ArrayList<>();
+		for (int i = 0; i < tool.length; i++) {
+			tools.add(tool[i]);
+		}
+		surfSprider.setTools(tools);
+		return surfSprider;
 	}
 
 
@@ -62,7 +78,7 @@ public class SurfSprider {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, null);
+			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me());
 		}
 		final List<Future<Page>> downloads = downloader.downloads();
 		Page page = null;
@@ -78,9 +94,18 @@ public class SurfSprider {
 	 * request async
 	 */
 	public void start() {
-		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor);
+		if(requests.size() == 0){
+			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
-		downloader.downloads();
+		if (downloader == null) {
+			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, pageProcessor.getSite());
+		}
+		final List<Future<Page>> pages = downloader.downloads();
+
+		if(this.tools != null){
+			this.tools.forEach(e->{
+				e.doWork(pageProcessor, pages);
+			});
+		}
 	}
 }

@@ -1,14 +1,11 @@
 package com.yilnz.surfing.examples.advance;
 
-import com.yilnz.surfing.core.SurfHttpClient;
 import com.yilnz.surfing.core.SurfHttpRequest;
+import com.yilnz.surfing.core.SurfPageProcessor;
 import com.yilnz.surfing.core.SurfSprider;
-import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selectors;
-
-import java.util.ArrayList;
 
 public class TiebaTestWithThreads {
 	/**
@@ -27,13 +24,14 @@ public class TiebaTestWithThreads {
 			r.setMethod("get");
 			r.setUrl(lastpagea.select(Selectors.replace("(.+)&pn=.+", "https:$1&pn=" + i)).get());
 			int finalI = i;
-			SurfSprider.create().addRequest(r).thread(5).setProcessor(page -> {
-				page.getHtml().select(Selectors.$("a.j_th_tit")).nodes().forEach(e->{
-					System.out.println(e.get());
-				});
-			}).start();
-
-
+			SurfSprider.create().addRequest(r).thread(5).setProcessor(new SurfPageProcessor() {
+				@Override
+				public void process(Page page) {
+					page.getHtml().select(Selectors.$("a.j_th_tit")).nodes().forEach(e -> {
+						System.out.println(e.get());
+					});
+				}}
+			).start();
 		}
 	}
 }

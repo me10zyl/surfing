@@ -60,9 +60,6 @@ public class CssSelector extends Selector {
                 res.add(finalText);
             }
         }
-        if(res.size() == 0){
-            return null;
-        }
         return res;
     }
 }
