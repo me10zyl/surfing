@@ -1,6 +1,6 @@
 # surfing 
 
-易用的爬虫框架
+易用的爬虫框架，支持 CSS、Regex、XPath、JSONPath 提取文本，也有同步、异步类型的请求，也支持多线程并发爬取网页。
 
 # CSS Selector
 
