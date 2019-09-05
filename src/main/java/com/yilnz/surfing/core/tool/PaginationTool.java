@@ -2,7 +2,6 @@ package com.yilnz.surfing.core.tool;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessor;
-import com.yilnz.surfing.core.SurfPageProcessorInterface;
 import com.yilnz.surfing.core.SurfSprider;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.selectors.Selector;

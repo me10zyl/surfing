@@ -3,6 +3,7 @@ package com.yilnz.surfing.core;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
+import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,26 @@ public class SurfSprider {
 
 	public static SurfSprider create() {
 		return new SurfSprider();
+	}
+
+	public static Page get(String url){
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		surfHttpRequest.setUrl(url);
+		surfHttpRequest.setMethod("GET");
+		return SurfSprider.create().addRequest(surfHttpRequest).request();
+	}
+
+	public static Page post(String url, String body){
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		surfHttpRequest.setUrl(url);
+		surfHttpRequest.setMethod("POST");
+		surfHttpRequest.setBody(body);
+		return SurfSprider.create().addRequest(surfHttpRequest).request();
+	}
+
+	public static Page postJSON(String url, Object jsonObject){
+		final SurfHttpRequest post = new SurfHttpRequestBuilder(url, "POST").json(jsonObject).build();
+		return SurfSprider.create().addRequest(post).request();
 	}
 
 	public void setTools(List<Tool> tools) {

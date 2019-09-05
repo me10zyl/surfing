@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SurfHttpClient {
 
@@ -56,6 +57,9 @@ public class SurfHttpClient {
                 url += "?" + getParamsStr(request.getParams());
             }
             requests.setURI(URI.create(url));
+            for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
+                requests.setHeader(entry.getKey(), entry.getValue());
+            }
             String body = request.getBody();
             if(body == null && !request.getBodyParams().isEmpty()){
                 body = getParamsStr(request.getBodyParams());
