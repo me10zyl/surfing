@@ -21,13 +21,13 @@ public class PlainText extends AbstractSelectable {
 
     @Override
     public String get() {
-        if(this.text == null){
+        if (this.text == null) {
             return null;
         }
-        if(this.text.size() == 1){
+        if (this.text.size() == 1) {
             return text.get(0);
         }
-        if(this.text.size() == 0){
+        if (this.text.size() == 0) {
             return null;
         }
         return text.toString();
@@ -35,31 +35,32 @@ public class PlainText extends AbstractSelectable {
 
     @Override
     public Selectable select(Selector selector) {
-        final List<String> strings = selector.selectList(this.text.get(0));
+        final List<String> selectList = selector.selectList(this.text.get(0));
         final List<Selector> otherSelectors = selector.getOtherSelectors();
-        List<String> lastString = new ArrayList<>();
-        for (String string : strings) {
-            List<String> finalLastString = lastString;
-            otherSelectors.forEach(e->{
-                if("AND".equals(e.getLogicType())){
-                    finalLastString.addAll(e.selectList(string));
-                } else if ("OR".equals(e.getLogicType())) {
-                    finalLastString.add(string);
-                    finalLastString.addAll(e.selectList(string));
-                }
-            });
-        }
+        otherSelectors.forEach(otherSelector -> {
+                    if ("AND".equals(otherSelector.getLogicType())) {
+                        for (int i = selectList.size() - 1; i >=0 ; i--) {
+                            final String select = selectList.get(i);
+                            final List<String> otherSelectList = otherSelector.selectList(select);
+                            selectList.remove(i);
+                            selectList.addAll(i, otherSelectList);
+                        }
 
-        if(otherSelectors.size() == 0){
-            lastString = strings;
-        }
-        return new PlainText(lastString);
+                    } else if ("OR".equals(otherSelector.getLogicType())) {
+                        selectList.addAll(otherSelector.selectList(this.text.get(0)));
+                    }
+                }
+        );
+
+
+        return new PlainText(selectList);
     }
+
 
     @Override
     public List<Selectable> nodes() {
         List<Selectable> plainTexts = new ArrayList<>();
-        for(String text : this.text){
+        for (String text : this.text) {
             plainTexts.add(new PlainText(text));
         }
         return plainTexts;

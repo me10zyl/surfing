@@ -27,12 +27,18 @@ public abstract class Selector {
     public Selector and(Selector selector){
         selector.logicType = "AND";
         otherSelectors.add(selector);
+        if(selector.otherSelectors.size() > 0){
+            throw new UnsupportedOperationException("不能重复嵌套逻辑操作!");
+        }
         return this;
     }
 
     public Selector or(Selector selector) {
         selector.logicType = "OR";
         otherSelectors.add(selector);
+        if(selector.otherSelectors.size() > 0){
+            throw new UnsupportedOperationException("不能重复嵌套逻辑操作!");
+        }
         return this;
     }
 }

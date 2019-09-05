@@ -10,11 +10,6 @@ public class SpriderTest2 {
 		request.setMethod("GET");
 		SurfSprider.create().addRequest(request).setProcessor(new SurfPageProcessor() {
 			@Override
-			public Site getSite() {
-				return Site.me();
-			}
-
-			@Override
 			public void process(Page page) {
 				System.out.println(page.getHtml().get());
 			}

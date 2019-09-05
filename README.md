@@ -1,6 +1,6 @@
 # surfing 
 
-易用的爬虫框架，支持 CSS、Regex、XPath、JSONPath 提取文本，也有同步、异步类型的请求，也支持多线程并发爬取网页。
+简单易用的爬虫框架，支持 CSS、Regex、XPath、JSONPath 提取文本，也可以发起同步、异步类型的HTTP请求，也支持多线程并发爬取网页。
 
 # CSS Selector
 
@@ -32,9 +32,53 @@ nodes.forEach(e->{
     System.out.println(e.select(Selectors.$("a", "name")));
 });
 ```
+
+#JsonPath Selector 
+
+```java
+   SurfHttpRequest request = new SurfHttpRequest();
+         request.setMethod("get");
+         request.setUrl("https://jsonplaceholder.typicode.com/posts");
+         final Page page = SurfSprider.create().addRequest(request).request();
+         final Selectable select = page.getHtml().select(Selectors.jsonPath("$.title"));
+         final List<Selectable> nodes = select.nodes();
+         nodes.forEach(e->{
+             System.out.println(e);
+         });
+```
+
+# XPath Selector
+
+```java
+ SurfHttpRequest request = new SurfHttpRequest();
+        request.setUrl("https://www.baidu.com");
+        request.setMethod("Get");
+        final Page page = SurfSprider.create().addRequest(request).request();
+        final Selectable select = page.getHtml().select(Selectors.xpath("//a/text()"));
+        final List<Selectable> nodes = select.nodes();
+        nodes.forEach(e->{
+            System.out.println(e);
+        });
+```
+
+# 选择器的逻辑连接
+选择所有以//开头的a的href和img的src
+```java
+final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+surfHttpRequest.setMethod("get");
+surfHttpRequest.setUrl("http://www.baidu.com");
+final Page page = SurfSprider.create().addRequest(surfHttpRequest).request();
+page.getHtml().select(Selectors.$("a", "href")
+        .or(Selectors.$("img", "src"))
+        .and(Selectors.regex("^//.+"))).nodes().forEach(e->{
+    System.out.println(e.get());
+});
+
+```
+
 # 多线程并发爬取分页
 
-一次爬5页百度贴吧，并打印帖子主题
+一次爬5页百度贴吧，并打印帖子主题。
 
 ```java
 final SurfHttpRequest request1 = new SurfHttpRequest();
@@ -64,6 +108,65 @@ SurfSprider.create(new PaginationTool("http://tieba.baidu.com/f?kw=java&fr=index
 }).addRequest(request1).start();
 ```
 
+# 同步请求
+
+**SurfSprider#request**方法会阻塞当前线程，直到返回结果。
+
+```java
+ SurfHttpRequest request = new SurfHttpRequest();
+    request.setUrl("http://www.baidu.com");
+    request.setMethod("GET");
+    final Page page = SurfSprider.create().addRequest(request).request();
+    System.out.println("同步请求");
+```
+
+# 异步请求
+
+**SurfSprider#start**方法不会阻塞当前线程，状态码为200的结果会返回到**PageProcessor**的`process`方法。
+```java
+final SurfHttpRequest request = new SurfHttpRequest();
+		request.setUrl("http://www.baidu.com");
+		request.setMethod("GET");
+		SurfSprider.create().addRequest(request).setProcessor(new SurfPageProcessor() {
+			@Override
+			public void process(Page page) {
+				System.out.println(page.getHtml().get());
+			}
+		}).start();
+```
+
+非200状态码的结果，在尝试`retryTimes`(默认为2)次都非200后，会返回到**PageProcessor**的`processError`方法，如果传入多个请求，可以设置线程数并发请求，否则是单线程请求(thread默认为1)，每两次请求的间隔时间为`sleepTime`(默认200)毫秒。
+```java
+ final SurfHttpRequest request = new SurfHttpRequest();
+         request.setUrl("https://www.baidu.com");
+         request.setMethod("GET");
+         final SurfHttpRequest request2 = new SurfHttpRequest();
+         request2.setUrl("https://www.baidu.com");
+         request2.setMethod("GET");
+         final SurfHttpRequest request3 = new SurfHttpRequest();
+         request3.setUrl("http://www.baidu.com/s");
+         request3.addParams("wd", "java");
+         request3.setMethod("GET");
+         SurfSprider.create().
+                 addRequest(request)
+                 .addRequest(request2)
+                 .addRequest(request3).thread(5).setProcessor(new SurfPageProcessor() {
+             @Override
+             public Site getSite() {
+                 return Site.me().setRetryTimes(2).setSleepTime(500);
+             }
+ 
+             @Override
+             public void process(Page page) {
+                 System.out.println(page.getUrl());
+             }
+ 
+             @Override
+             public void processError(Page page) {
+                 System.out.println(page.getUrl() +"-- error");
+             }
+         }).start();
+```
 
 # Thanks to
 + [https://github.com/code4craft/webmagic](https://github.com/code4craft/webmagic)

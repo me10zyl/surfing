@@ -51,7 +51,10 @@ public class CssSelector extends Selector {
         while(iterator.hasNext()){
             final Element next = iterator.next();
             if(this.attr != null) {
-                res.add(next.attr(this.attr));
+                final String attr = next.attr(this.attr);
+                if(!"".equals(attr)) {
+                    res.add(attr);
+                }
             }else{
                 String finalText = next.toString();
                 if(!containsTag){
