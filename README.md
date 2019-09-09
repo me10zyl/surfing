@@ -170,7 +170,7 @@ final SurfHttpRequest request = new SurfHttpRequest();
 
 # 下载文件
 
-下载百度所有图片
+开启5个线程下载百度所有图片
 
 ```java
 final Html html = SurfSprider.get("http://www.baidu.com").getHtml();
