@@ -168,5 +168,20 @@ final SurfHttpRequest request = new SurfHttpRequest();
          }).start();
 ```
 
+# 下载文件
+
+下载百度所有图片
+
+```java
+final Html html = SurfSprider.get("http://www.baidu.com").getHtml();
+this.urls = html.select(Selectors.$("img", "src")).nodes().stream().map(Selectable::get).collect(Collectors.toList());
+SurfSprider.download('/path/to/save/file/', 5, new FileDownloadProcessor() {
+        @Override
+        public void downloadFinished(DownloadFile downloadFile) {
+            System.out.println("downloaded " + downloadFile.getFilename());
+        }
+}, null, urls.toArray(new String[]{}));
+```
+
 # Thanks to
 + [https://github.com/code4craft/webmagic](https://github.com/code4craft/webmagic)
