@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 
 public class SurfHttpDownloader implements Downloader {
 
-	private final SurfPageProcessorInterface pageProcessor;
+	private SurfPageProcessorInterface pageProcessor;
 	private int threadNum;
 	private ExecutorService threadPool;
 	private Site site;

@@ -3,6 +3,8 @@ package com.yilnz.surfing.core;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
+import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
+import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.tool.Tool;
 import org.slf4j.Logger;
@@ -34,6 +36,17 @@ public class SurfSprider {
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("GET");
 		return SurfSprider.create().addRequest(surfHttpRequest).request();
+	}
+
+	public static void download(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
+		List<SurfHttpRequest> requests = new ArrayList<>();
+		for (int i = 0; i < urls.length; i++) {
+			final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+			surfHttpRequest.setUrl(urls[i]);
+			requests.add(surfHttpRequest);
+		}
+		final SurfFileDownloader downloader = new SurfFileDownloader(requests, threadnum, fileDownloadProcessor, fileNameRegex);
+		downloader.downloadFiles(basePath);
 	}
 
 	public static Page post(String url, String body){
