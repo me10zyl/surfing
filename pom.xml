@@ -6,7 +6,7 @@
 
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1</version>
+    <version>0.1.1</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -24,6 +24,17 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>sonatype-nexus-staging</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
@@ -72,6 +83,7 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.57</version>
         </dependency>
+
     </dependencies>
 
     <licenses>
