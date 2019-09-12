@@ -7,6 +7,15 @@
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
     <version>0.1</version>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <description>An Easy WebSpider</description>
+    
     <build>
         <plugins>
             <plugin>
@@ -64,4 +73,26 @@
             <version>1.2.57</version>
         </dependency>
     </dependencies>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/me10zyl/surfing.git</connection>
+        <developerConnection>scm:git:git@github.com:me10zyl/surfing.git</developerConnection>
+        <url>https://github.com/me10zyl/surfing</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>iteblog</name>
+            <email>me10zyl@qq.com</email>
+            <url>https://www.yilnz.com</url>
+        </developer>
+    </developers>
 </project>
