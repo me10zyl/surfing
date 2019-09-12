@@ -183,5 +183,15 @@ SurfSprider.download('/path/to/save/file/', 5, new FileDownloadProcessor() {
 }, null, urls.toArray(new String[]{}));
 ```
 
+# 安装
+maven pom引用
+```java
+<dependency>
+    <groupId>com.yilnz</groupId>
+    <artifactId>surfing</artifactId>
+    <version>0.1.1</version>
+</dependency>
+```
+
 # Thanks to
 + [https://github.com/code4craft/webmagic](https://github.com/code4craft/webmagic)
