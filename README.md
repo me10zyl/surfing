@@ -7,6 +7,8 @@
 + 文件批量下载
 + JMX监控，可查看成功页面个数、失败页面个数、爬虫开始时间等
 
+![monitor](images/monitor.png)
+
 # CSS Selector
 
 用CSS选择器获取百度所有链接
