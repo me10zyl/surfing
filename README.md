@@ -2,6 +2,11 @@
 
 简单易用的爬虫框架，支持 CSS、Regex、XPath、JSONPath 提取文本，也可以发起同步、异步类型的HTTP请求，也支持多线程并发爬取网页。
 
+*新增功能*
+
++ 文件批量下载
++ JMX监控，可查看成功页面个数、失败页面个数、爬虫开始时间等
+
 # CSS Selector
 
 用CSS选择器获取百度所有链接
@@ -189,7 +194,7 @@ maven pom引用
 <dependency>
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
