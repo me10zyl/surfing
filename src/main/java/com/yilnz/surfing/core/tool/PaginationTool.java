@@ -36,13 +36,15 @@ public class PaginationTool implements Tool {
 	public void doWork(SurfPageProcessor pageProcessor, List<Future<Page>> pages){
 		try {
 			int lastPage = pages.get(0).get().getHtml().select(lastPageSelector).getInt();
+			final SurfSprider surfSprider = SurfSprider.create();
 			for(int i = step; i < lastPage; i+=step){
 				SurfHttpRequest r = new SurfHttpRequest();
 				r.setMethod("GET");
 				r.setUrl(prefix + i);
 				r.setData(i);
-				SurfSprider.create().addRequest(r).thread(threadnum).setProcessor(pageProcessor).start();
+				surfSprider.addRequest(r);
 			}
+			surfSprider.thread(threadnum).setProcessor(pageProcessor).start();
 		} catch (InterruptedException | ExecutionException e) {
 			logger.error("[surfing]Tool error", e);
 		}

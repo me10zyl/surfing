@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SurfHttpDownloader implements Downloader {
 
@@ -22,7 +24,31 @@ public class SurfHttpDownloader implements Downloader {
 	private ExecutorService threadPool;
 	private Site site;
 	private Logger logger = LoggerFactory.getLogger(SurfHttpDownloader.class);
+	private AtomicInteger totalPageCount = new AtomicInteger(0);
+	private AtomicInteger successPageCount = new AtomicInteger(0);
+	private AtomicInteger errorPageCount = new AtomicInteger(0);
+	private AtomicInteger retryPageCount = new AtomicInteger(0);
+	private Date startTime;
 
+	public AtomicInteger getRetryPageCount() {
+		return retryPageCount;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public AtomicInteger getErrorPageCount() {
+		return errorPageCount;
+	}
+
+	public AtomicInteger getTotalPageCount() {
+		return totalPageCount;
+	}
+
+	public AtomicInteger getSuccessPageCount() {
+		return successPageCount;
+	}
 
 	private List<SurfHttpRequest> requests;
 
@@ -42,6 +68,7 @@ public class SurfHttpDownloader implements Downloader {
 	}
 
 	private List<Future<Page>> downloads(List<SurfHttpRequest> requests) {
+		this.startTime = new Date();
 		SurfHttpClient httpClient = new SurfHttpClient();
 		List<Future<Page>> pages = new ArrayList<>();
 		requests.forEach(e->{
@@ -50,17 +77,21 @@ public class SurfHttpDownloader implements Downloader {
 				public Page call() throws Exception {
 					final Page page = httpClient.request(e);
 					page.setData(e.getData());
-					if(site.getRetryTimes() > 0 && page.getStatusCode() != 200){
-						final List<SurfHttpRequest> retryList = new ArrayList<>();
-						retryList.add(e);
-						new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes()-1));
-					}
-					if(pageProcessor != null && page.getStatusCode() == 200) {
-						pageProcessor.process(page);
-					}
-
-					if(site.getRetryTimes() <= 0){
-						pageProcessor.processError(page);
+					if(pageProcessor != null ) {
+						if (site.getRetryTimes() > 0 && page.getStatusCode() != 200) {
+							final List<SurfHttpRequest> retryList = new ArrayList<>();
+							retryList.add(e);
+							new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1));
+							retryPageCount.incrementAndGet();
+						} else if (page.getStatusCode() == 200) {
+							pageProcessor.process(page);
+							successPageCount.incrementAndGet();
+							totalPageCount.incrementAndGet();
+						} else if (site.getRetryTimes() <= 0) {
+							pageProcessor.processError(page);
+							errorPageCount.incrementAndGet();
+							totalPageCount.incrementAndGet();
+						}
 					}
 					return page;
 				}

@@ -185,7 +185,7 @@ SurfSprider.download('/path/to/save/file/', 5, new FileDownloadProcessor() {
 
 # 安装
 maven pom引用
-```java
+```xml
 <dependency>
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>

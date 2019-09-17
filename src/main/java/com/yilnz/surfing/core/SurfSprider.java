@@ -5,11 +5,14 @@ import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
+import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.*;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -133,6 +136,16 @@ public class SurfSprider {
 		}
 		if (downloader == null) {
 			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, pageProcessor.getSite());
+
+			//JMX监控
+			try {
+				MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+				ObjectName name = new ObjectName(String.format("spiderHttpStatusMBean-%s:name=spiderHttpStatus", this.hashCode()));
+				server.registerMBean(new SpiderHttpStatus((SurfHttpDownloader) downloader), name);
+			} catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
+				logger.error("[surfing]register jmx monitor error", e);
+			}
+
 		}
 		final List<Future<Page>> pages = downloader.downloads();
 
