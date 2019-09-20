@@ -38,6 +38,11 @@ public class SurfSprider {
 		return new SurfSprider();
 	}
 
+	/**
+	 * 阻塞型请求 - GET
+	 * @param url 请求地址
+	 * @return
+	 */
 	public static Page get(String url){
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
@@ -45,6 +50,14 @@ public class SurfSprider {
 		return SurfSprider.create().addRequest(surfHttpRequest).request();
 	}
 
+	/**
+	 * 非阻塞型请求 - 多线程批量下载文件
+	 * @param basePath 文件下载目录
+	 * @param threadnum 最大线程数
+	 * @param fileDownloadProcessor 文件下载完成回调
+	 * @param fileNameRegex 文件下载正则，匹配URL，如 [^/]+?(?=/$|$|\?)
+	 * @param urls 多个请求地址
+	 */
 	public static void download(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
 		for (int i = 0; i < urls.length; i++) {
@@ -56,7 +69,13 @@ public class SurfSprider {
 		downloader.downloadFiles(basePath);
 	}
 
-	public static File downloadIfExist(String filePath, String url){
+	/**
+	 * 阻塞型请求 - 在文件不存在的时候下载  例子. downloadIfNotExist("/tmp/" + FileUtil.getFileNameByUrl(url), url)
+	 * @param filePath 文件下载路径
+	 * @param url 请求地址
+	 * @return
+	 */
+	public static File downloadIfNotExist(String filePath, String url){
 		final File file = new File(filePath);
 		if(file.exists()){
 			return file;
@@ -64,6 +83,12 @@ public class SurfSprider {
 		return download(filePath, url);
 	}
 
+	/**
+	 * 阻塞型请求 - 下载文件 例子. download("/tmp/" + FileUtil.getFileNameByUrl(url), url)
+	 * @param filePath 文件下载路径
+	 * @param url 请求地址
+	 * @return
+	 */
 	public static File download(String filePath, String url) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -82,6 +107,12 @@ public class SurfSprider {
 		return new File(downloadFile.getFilename());
 	}
 
+	/**
+	 * 阻塞型请求 - POST
+	 * @param url 请求地址
+	 * @param body 请求体
+	 * @return
+	 */
 	public static Page post(String url, String body){
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
@@ -137,7 +168,7 @@ public class SurfSprider {
 	}
 
 	/**
-	 * request sync
+	 * 阻塞型请求 - 开始爬取
 	 * @return
 	 */
 	public Page request(){
@@ -158,7 +189,7 @@ public class SurfSprider {
 	}
 
 	/**
-	 * request async
+	 * 非阻塞型请求 - 开始爬取
 	 */
 	public void start() {
 		if(requests.size() == 0){
