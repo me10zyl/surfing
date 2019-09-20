@@ -3,8 +3,10 @@ package com.yilnz.surfing.core;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
+import com.yilnz.surfing.core.downloader.filedownload.DownloadFile;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
+import com.yilnz.surfing.core.downloader.filedownload.TmpFile;
 import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.tool.Tool;
@@ -12,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -50,6 +54,32 @@ public class SurfSprider {
 		}
 		final SurfFileDownloader downloader = new SurfFileDownloader(requests, threadnum, fileDownloadProcessor, fileNameRegex);
 		downloader.downloadFiles(basePath);
+	}
+
+	public static File downloadIfExist(String filePath, String url){
+		final File file = new File(filePath);
+		if(file.exists()){
+			return file;
+		}
+		return download(filePath, url);
+	}
+
+	public static File download(String filePath, String url) {
+		List<SurfHttpRequest> requests = new ArrayList<>();
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		surfHttpRequest.setUrl(url);
+		requests.add(surfHttpRequest);
+		final SurfFileDownloader downloader = new SurfFileDownloader(requests, filePath);
+		DownloadFile downloadFile = null;
+		try {
+			downloadFile = downloader.downloadFiles(filePath).get(0).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		if (downloadFile == null) {
+			return null;
+		}
+		return new File(downloadFile.getFilename());
 	}
 
 	public static Page post(String url, String body){

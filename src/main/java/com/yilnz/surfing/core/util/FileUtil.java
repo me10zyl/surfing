@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class FileUtil {
 	public static String getFileNameByUrl(String url){
-		return getFileNameByUrl(url, "[^/]+(?=/$|$)");
+		return getFileNameByUrl(url, "[^/]+?(?=/$|$|\\?)");
 	}
 
 	public static String getFileNameByUrl(String url, String regex){

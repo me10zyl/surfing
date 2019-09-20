@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 public class SurfFileDownloader implements Downloader {
 
+	private String fileName;
 	private FileDownloadProcessor fileDownloadProcessor;
 	private int threadNum;
 	private ExecutorService threadPool;
@@ -44,6 +45,13 @@ public class SurfFileDownloader implements Downloader {
 		initComponents();
 	}
 
+	public SurfFileDownloader(List<SurfHttpRequest> requests, String fileName) {
+		this.requests = requests;
+		this.threadNum = 1;
+		this.fileName = fileName;
+		initComponents();
+	}
+
 	public SurfFileDownloader(List<SurfHttpRequest> requests, int threadnum, FileDownloadProcessor fileDownloadProcessor) {
 		this(requests, threadnum, fileDownloadProcessor, null);
 	}
@@ -51,6 +59,7 @@ public class SurfFileDownloader implements Downloader {
 	private void initComponents(){
 		threadPool = Executors.newFixedThreadPool(threadNum);
 	}
+
 
 	public List<Future<DownloadFile>> downloadFiles(String basePath){
 		List<Future<DownloadFile>> futures = new ArrayList<>();
@@ -64,10 +73,15 @@ public class SurfFileDownloader implements Downloader {
 				String filepath = null;
 				try {
 					in = new URL(e.getFullUrl()).openStream();
-					if(fileNameRegex != null) {
-						filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl(), fileNameRegex);
+
+					if(fileName == null) {
+						if (fileNameRegex != null) {
+							filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl(), fileNameRegex);
+						} else {
+							filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl());
+						}
 					}else{
-						filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl());
+						filepath = fileName;
 					}
 					Files.copy(in, Paths.get(filepath), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e1) {
