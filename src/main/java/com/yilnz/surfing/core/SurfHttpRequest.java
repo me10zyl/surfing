@@ -20,7 +20,6 @@ public class SurfHttpRequest {
         for (Map.Entry<String, String> entry : getHeaders().entrySet()) {
             sb.append(entry.getKey()).append(":").append(entry.getValue()).append("\n");
         }
-        System.out.println(sb.toString());
         return sb.toString();
     }
 
