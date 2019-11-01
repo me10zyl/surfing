@@ -102,9 +102,9 @@
             <id>local</id>
             <distributionManagement>
                 <repository>
-                    <id>snapshots</id>
-                    <name>snapshots</name>
-                    <url>http://192.168.4.13:8081/nexus/content/repositories/snapshots</url>
+                    <id>releases</id>
+                    <name>Releases</name>
+                    <url>http://192.168.4.13:8081/nexus/content/repositories/releases</url>
                 </repository>
             </distributionManagement>
         </profile>

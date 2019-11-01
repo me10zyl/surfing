@@ -2,6 +2,7 @@ package com.yilnz.surfing.core;
 
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.Page;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -95,5 +96,9 @@ public class SurfHttpClient {
         final int statusCode = response.getStatusLine().getStatusCode();
         page.setStatusCode(statusCode);
         page.setHtml(new Html(result.toString()));
+        final Header[] allHeaders = response.getAllHeaders();
+        for (Header h : allHeaders) {
+            page.getHeaders().add(new com.yilnz.surfing.core.basic.Header(h.getName(), h.getValue()));
+        }
     }
 }
