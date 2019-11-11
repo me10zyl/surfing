@@ -104,11 +104,13 @@ public class SurfFileDownloader implements Downloader {
 					while ((len = errorStream.read(buffer)) > 0) {
 						sb.append(new String(buffer, 0, len));
 					}
+					errorStream.close();
 					logger.error("[surfing]download error #2 {}", sb.toString());
 				}finally {
 					if (in != null) {
 						in.close();
 					}
+					urlConnection.disconnect();
 				}
 				final DownloadFile downloadFile = new DownloadFile();
 				downloadFile.setUrl(e.getFullUrl());
