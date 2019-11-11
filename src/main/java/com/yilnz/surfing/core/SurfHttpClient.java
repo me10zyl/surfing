@@ -46,6 +46,9 @@ public class SurfHttpClient {
 
         Page page = new Page();
         page.setUrl(request.getUrl());
+        if(request.getMethod() == null){
+            request.setMethod("GET");
+        }
         try {
             final HttpEntityEnclosingRequestBase requests = new HttpEntityEnclosingRequestBase() {
                 @Override
@@ -65,6 +68,8 @@ public class SurfHttpClient {
             String body = request.getBody();
             if(body == null && !request.getBodyParams().isEmpty()){
                 body = getParamsStr(request.getBodyParams());
+                requests.setEntity(new StringEntity(body));
+            }else if(body != null){
                 requests.setEntity(new StringEntity(body));
             }
             requestInternal(page,closeableHttpClient, requests);

@@ -1,6 +1,7 @@
 package com.yilnz.surfing.core.basic;
 
 import com.yilnz.surfing.core.selectors.AbstractSelectable;
+import com.yilnz.surfing.core.selectors.JsonSelector;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selector;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class PlainText extends AbstractSelectable {
 
-    private List<String> text = new ArrayList<>();
+    protected List<String> text = new ArrayList<>();
 
     public PlainText(String text) {
         this.text.add(text);
@@ -53,6 +54,9 @@ public class PlainText extends AbstractSelectable {
         );
 
 
+        if(selector instanceof JsonSelector){
+            return new Json(selectList);
+        }
         return new PlainText(selectList);
     }
 

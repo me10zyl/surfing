@@ -15,6 +15,14 @@ public class SurfHttpRequest {
     private HeaderGenerator headerGenerator;
     private Object data;
 
+    public SurfHttpRequest() {
+    }
+
+    public SurfHttpRequest(Site site) {
+        setHeaders(site.getHeaders());
+    }
+
+
     public String getHeadersString(){
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : getHeaders().entrySet()) {
@@ -93,5 +101,9 @@ public class SurfHttpRequest {
 
     public void addBodyParams(String name, String value){
         bodyParams.put(name, value);
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 }

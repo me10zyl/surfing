@@ -69,18 +69,26 @@ public class SurfSprider {
 		downloader.downloadFiles(basePath);
 	}
 
+	public static File downloadIfNotExist(String filePath, String url){
+		return downloadIfNotExist(filePath, url, null);
+	}
+
+	public static File download(String filePath, String url){
+		return download(filePath, url, null);
+	}
+
 	/**
 	 * 阻塞型请求 - 在文件不存在的时候下载  例子. downloadIfNotExist("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 * @param filePath 文件下载路径
 	 * @param url 请求地址
 	 * @return
 	 */
-	public static File downloadIfNotExist(String filePath, String url){
+	public static File downloadIfNotExist(String filePath, String url, Site site){
 		final File file = new File(filePath);
 		if(file.exists()){
 			return file;
 		}
-		return download(filePath, url);
+		return download(filePath, url, site);
 	}
 
 	/**
@@ -89,9 +97,9 @@ public class SurfSprider {
 	 * @param url 请求地址
 	 * @return
 	 */
-	public static File download(String filePath, String url) {
+	public static File download(String filePath, String url, Site site) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
-		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest(site);
 		surfHttpRequest.setUrl(url);
 		requests.add(surfHttpRequest);
 		final SurfFileDownloader downloader = new SurfFileDownloader(requests, filePath);
@@ -106,6 +114,9 @@ public class SurfSprider {
 		}
 		return new File(downloadFile.getFilename());
 	}
+
+
+
 
 	/**
 	 * 阻塞型请求 - POST
