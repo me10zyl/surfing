@@ -107,6 +107,9 @@
                     <url>http://192.168.4.13:8081/nexus/content/repositories/releases</url>
                 </repository>
             </distributionManagement>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>sonatype-oss-release</id>
