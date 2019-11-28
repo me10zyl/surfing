@@ -44,6 +44,9 @@ public class SurfHttpRequestBuilder {
 				req.addParams(next.getKey(), next.getValue());
 			}
 		}
+		if (this.body != null) {
+			req.setBody(this.body);
+		}
 		return req;
 	}
 }

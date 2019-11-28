@@ -7,6 +7,7 @@ import com.yilnz.surfing.core.downloader.filedownload.DownloadFile;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
 import com.yilnz.surfing.core.downloader.filedownload.TmpFile;
+import com.yilnz.surfing.core.header.generators.ChromeHeaderGenerator;
 import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.tool.Tool;
