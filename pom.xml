@@ -72,9 +72,12 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.57</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.brotli</groupId>
+            <artifactId>dec</artifactId>
+            <version>0.1.2</version>
+        </dependency>
     </dependencies>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>

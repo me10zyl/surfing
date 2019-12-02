@@ -5,27 +5,38 @@ import com.yilnz.surfing.core.basic.Page;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.brotli.dec.BrotliInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+class BrotliDecompressingEntity extends DecompressingEntity {
+    BrotliDecompressingEntity(HttpEntity entity) {
+        super(entity, new InputStreamFactory() {
+            public InputStream create(InputStream instream) throws IOException {
+                return new BrotliInputStream(instream);
+            }
+        });
+    }
+}
 
 public class SurfHttpClient {
 
@@ -42,8 +53,9 @@ public class SurfHttpClient {
     }
 
     public Page request(SurfHttpRequest request){
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-        final CloseableHttpClient closeableHttpClient = builder.build();
+        RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
+        //final HttpClientBuilder builder = HttpClientBuilder.create();
+        final CloseableHttpClient closeableHttpClient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
 
         Page page = new Page();
         page.setUrl(request.getUrl());
@@ -91,17 +103,29 @@ public class SurfHttpClient {
 
     private void requestInternal(Page page, CloseableHttpClient closeableHttpClient, HttpUriRequest requests) throws IOException {
         final CloseableHttpResponse response = closeableHttpClient.execute(requests);
-        final HttpEntity entity = response.getEntity();
-        final InputStream inputStream = entity.getContent();
+        final Header encoding = response.getFirstHeader("content-encoding");
+        HttpEntity entity;
+        if(encoding != null && encoding.getValue().equals("gzip")){
+            entity = new GzipDecompressingEntity(response.getEntity());
+        } else if(encoding != null && encoding.getValue().equals("deflate")){
+            entity = new DeflateDecompressingEntity(response.getEntity());
+        } else if(encoding != null && encoding.getValue().equals("br")){
+            entity = new BrotliDecompressingEntity(response.getEntity());
+        } else{
+            entity = response.getEntity();
+            //logger.info("[surfing]ContentEncoding:"+ encoding);
+
+        }
+      /*  final InputStream inputStream = entity.getContent();
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String str;
         StringBuilder result = new StringBuilder();
         while((str = bufferedReader.readLine()) != null){
             result.append(str);
-        }
+        }*/
         final int statusCode = response.getStatusLine().getStatusCode();
         page.setStatusCode(statusCode);
-        page.setHtml(new Html(result.toString()));
+        page.setHtml(new Html(EntityUtils.toString(entity)));
         final Header[] allHeaders = response.getAllHeaders();
         for (Header h : allHeaders) {
             page.getHeaders().add(new com.yilnz.surfing.core.basic.Header(h.getName(), h.getValue()));

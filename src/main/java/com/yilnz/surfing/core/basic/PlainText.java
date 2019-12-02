@@ -4,11 +4,15 @@ import com.yilnz.surfing.core.selectors.AbstractSelectable;
 import com.yilnz.surfing.core.selectors.JsonSelector;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlainText extends AbstractSelectable {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlainText.class);
 
     protected List<String> text = new ArrayList<>();
 
@@ -37,6 +41,15 @@ public class PlainText extends AbstractSelectable {
     @Override
     public Selectable select(Selector selector) {
         final List<String> selectList = selector.selectList(this.text.get(0));
+        if (selectList == null) {
+            if(this instanceof Html){
+                logger.warn("[surfing]选择结果为空 {} {} {}", ((Html)this).getUrl(), selector, this.text.get(0));
+            }else{
+                logger.warn("[surfing]选择结果为空 {} {}", selector, this.text.get(0));
+            }
+
+            return null;
+        }
         final List<Selector> otherSelectors = selector.getOtherSelectors();
         otherSelectors.forEach(otherSelector -> {
                     if ("AND".equals(otherSelector.getLogicType())) {
@@ -52,7 +65,6 @@ public class PlainText extends AbstractSelectable {
                     }
                 }
         );
-
 
         if(selector instanceof JsonSelector){
             return new Json(selectList);

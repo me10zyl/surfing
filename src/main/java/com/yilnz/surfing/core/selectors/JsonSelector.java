@@ -21,6 +21,9 @@ public class JsonSelector extends Selector{
     @Override
     public List<String> selectList(String text) {
         final Object read = JSONPath.read(text, selectPattern);
+        if (read == null) {
+            return null;
+        }
         if(read instanceof List){
             List<String> res = new ArrayList<>();
             final JSONArray jsonArray = (JSONArray) read;

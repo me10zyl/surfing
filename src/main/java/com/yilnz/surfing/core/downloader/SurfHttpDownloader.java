@@ -74,24 +74,39 @@ public class SurfHttpDownloader implements Downloader {
 		requests.forEach(e->{
 			pages.add(threadPool.submit(new Callable<Page>() {
 				@Override
-				public Page call() throws Exception {
-					final Page page = httpClient.request(e);
-					page.setData(e.getData());
-					if(pageProcessor != null ) {
-						if (site.getRetryTimes() > 0 && page.getStatusCode() != 200) {
-							final List<SurfHttpRequest> retryList = new ArrayList<>();
-							retryList.add(e);
-							new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1));
-							retryPageCount.incrementAndGet();
-						} else if (page.getStatusCode() == 200) {
-							pageProcessor.process(page);
-							successPageCount.incrementAndGet();
-							totalPageCount.incrementAndGet();
-						} else if (site.getRetryTimes() <= 0) {
-							pageProcessor.processError(page);
-							errorPageCount.incrementAndGet();
-							totalPageCount.incrementAndGet();
+				public Page call() {
+					Page page = null;
+					try {
+						page = httpClient.request(e);
+						page.setData(e.getData());
+						if (pageProcessor != null) {
+							if (site.getRetryTimes() > 0 && page.getStatusCode() != 200) {
+								logger.warn("[surfing]状态码 {}, 重试 {}, 重试次数还剩 {} 次, 消息体 {}", page.getStatusCode(), page.getUrl(), site.getRetryTimes(), page.getHtml().get());
+								final List<SurfHttpRequest> retryList = new ArrayList<>();
+								retryList.add(e);
+								new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1)).downloads();
+								retryPageCount.incrementAndGet();
+							} else if (page.getStatusCode() == 200) {
+								try {
+									pageProcessor.process(page);
+								} catch (Exception e) {
+									logger.error("[surfing]process error", e);
+								}
+								successPageCount.incrementAndGet();
+								totalPageCount.incrementAndGet();
+							} else if (site.getRetryTimes() <= 0) {
+								try {
+									pageProcessor.processError(page);
+								} catch (Exception e) {
+									logger.error("[surfing]processERROR error", e);
+								}
+								errorPageCount.incrementAndGet();
+								totalPageCount.incrementAndGet();
+								logger.error("[surfing]重试次数已用尽:状态码 {}, 请求地址 {}, 消息体 {}",page.getStatusCode(), page.getUrl(), page.getHtml().get());
+							}
 						}
+					}catch (Exception e){
+						logger.error("[surfing]request error", e);
 					}
 					return page;
 				}

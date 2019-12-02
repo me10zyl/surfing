@@ -41,4 +41,13 @@ public abstract class Selector {
         }
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Selector{" +
+                "selectPattern='" + selectPattern + '\'' +
+                ", logicType='" + logicType + '\'' +
+                ", otherSelectors=" + otherSelectors +
+                '}';
+    }
 }

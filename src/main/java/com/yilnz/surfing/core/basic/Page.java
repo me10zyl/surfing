@@ -61,6 +61,8 @@ public class Page {
     }
 
     public Html getHtml() {
+        final Html html = this.html;
+        html.setUrl(url);
         return html;
     }
 

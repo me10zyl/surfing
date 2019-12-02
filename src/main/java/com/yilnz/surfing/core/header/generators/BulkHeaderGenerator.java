@@ -17,8 +17,9 @@ public class BulkHeaderGenerator implements HeaderGenerator {
         final String[] split = bulk.split("\n");
         Map<String, String> res = new HashMap<>();
         for (String s : split) {
-            final String[] split1 = s.split(":");
-            res.put(split1[0], split1[1]);
+            //final String[] split1 = s.split(":");
+            final int indexOf = s.indexOf(":");
+            res.put(s.substring(0, indexOf), s.substring(indexOf + 1));
         }
         return res;
     }
