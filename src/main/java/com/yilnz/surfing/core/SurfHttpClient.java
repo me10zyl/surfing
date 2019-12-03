@@ -2,6 +2,9 @@ package com.yilnz.surfing.core;
 
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.Page;
+import com.yilnz.surfing.core.proxy.HttpProxy;
+import com.yilnz.surfing.core.proxy.IPPool;
+import com.yilnz.surfing.core.proxy.ProxyProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -13,6 +16,7 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -42,6 +46,28 @@ public class SurfHttpClient {
 
     private Logger logger = LoggerFactory.getLogger(SurfHttpClient.class);
 
+    private HttpProxy proxy;
+
+    public HttpProxy getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(HttpProxy proxy) {
+        this.proxy = proxy;
+    }
+
+
+    private ProxyProvider proxyProvider;
+
+
+    public ProxyProvider getProxyProvider() {
+        return proxyProvider;
+    }
+
+    public void setProxyProvider(ProxyProvider proxyProvider) {
+        this.proxyProvider = proxyProvider;
+    }
+
     public Page post(SurfHttpRequest request){
         request.setMethod("POST");
         return request(request);
@@ -55,10 +81,32 @@ public class SurfHttpClient {
     public Page request(SurfHttpRequest request){
         RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
         //final HttpClientBuilder builder = HttpClientBuilder.create();
-        final CloseableHttpClient closeableHttpClient = HttpClients.custom().setDefaultRequestConfig(globalConfig).build();
-
+        final HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(globalConfig);
+        boolean useProxy = false;
+        if (proxy != null) {
+            if(proxy == HttpProxy.RANDOM_PROXY){
+                proxy = IPPool.randomProxy();
+            }
+            httpClientBuilder.setProxy(proxy.getHttpHost());
+            useProxy = true;
+        }
+        if (proxyProvider != null) {
+            if(proxyProvider.getProxy() == HttpProxy.RANDOM_PROXY){
+                proxy = IPPool.randomProxy();
+            }else{
+                proxy = proxyProvider.getProxy();
+            }
+            httpClientBuilder.setProxy(proxy.getHttpHost());
+            useProxy = true;
+        }
+        if(useProxy){
+            logger.info("[surfing]使用代理:" + proxy.getHttpHost());
+        }
+        final CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
         Page page = new Page();
         page.setUrl(request.getUrl());
+        page.setHtml(new Html(""));
+        page._toUseProx(proxy);
         if(request.getMethod() == null){
             request.setMethod("GET");
         }

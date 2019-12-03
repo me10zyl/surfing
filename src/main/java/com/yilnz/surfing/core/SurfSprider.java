@@ -6,10 +6,9 @@ import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
 import com.yilnz.surfing.core.downloader.filedownload.DownloadFile;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
-import com.yilnz.surfing.core.downloader.filedownload.TmpFile;
-import com.yilnz.surfing.core.header.generators.ChromeHeaderGenerator;
 import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
-import com.yilnz.surfing.core.selectors.Selectable;
+import com.yilnz.surfing.core.proxy.HttpProxy;
+import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.tool.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -30,6 +28,26 @@ public class SurfSprider {
 	private static final Logger logger = LoggerFactory.getLogger(SurfSprider.class);
 	private SurfPageProcessor pageProcessor;
 	private List<Tool> tools = new ArrayList<>();
+	private HttpProxy proxy;
+	private ProxyProvider proxyProvider;
+
+	public ProxyProvider getProxyProvider() {
+		return proxyProvider;
+	}
+
+	public SurfSprider setProxyProvider(ProxyProvider proxyProvider) {
+		this.proxyProvider = proxyProvider;
+		return this;
+	}
+
+	public HttpProxy getProxy() {
+		return proxy;
+	}
+
+	public SurfSprider setProxy(HttpProxy proxy) {
+		this.proxy = proxy;
+		return this;
+	}
 
 	private SurfSprider() {
 		this.requests = new ArrayList<>();
@@ -188,7 +206,7 @@ public class SurfSprider {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me());
+			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
 		}
 		final List<Future<Page>> downloads = downloader.downloads();
 		Page page = null;
@@ -208,7 +226,7 @@ public class SurfSprider {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, pageProcessor.getSite());
+			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, pageProcessor.getSite(), this.proxy, this.proxyProvider);
 
 			//JMX监控
 			try {

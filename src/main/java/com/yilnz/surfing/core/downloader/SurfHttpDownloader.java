@@ -5,6 +5,8 @@ import com.yilnz.surfing.core.SurfHttpClient;
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessorInterface;
 import com.yilnz.surfing.core.basic.Page;
+import com.yilnz.surfing.core.proxy.HttpProxy;
+import com.yilnz.surfing.core.proxy.ProxyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,16 @@ public class SurfHttpDownloader implements Downloader {
 	private AtomicInteger errorPageCount = new AtomicInteger(0);
 	private AtomicInteger retryPageCount = new AtomicInteger(0);
 	private Date startTime;
+	private HttpProxy proxy;
+	private ProxyProvider proxyProvider;
+
+	public HttpProxy getProxy() {
+		return proxy;
+	}
+
+	public void setProxy(HttpProxy proxy) {
+		this.proxy = proxy;
+	}
 
 	public AtomicInteger getRetryPageCount() {
 		return retryPageCount;
@@ -52,7 +64,7 @@ public class SurfHttpDownloader implements Downloader {
 
 	private List<SurfHttpRequest> requests;
 
-	public SurfHttpDownloader(List<SurfHttpRequest> requests, int threadNum, SurfPageProcessorInterface pageProcessor, Site site) {
+	public SurfHttpDownloader(List<SurfHttpRequest> requests, int threadNum, SurfPageProcessorInterface pageProcessor, Site site, HttpProxy proxy, ProxyProvider proxyProvider) {
 		this.requests = requests;
 		this.threadNum = threadNum;
 		if(threadNum <= 1){
@@ -60,6 +72,8 @@ public class SurfHttpDownloader implements Downloader {
 		}
 		this.pageProcessor = pageProcessor;
 		this.site = site;
+		this.proxy = proxy;
+		this.proxyProvider = proxyProvider;
 		initComponents();
 	}
 
@@ -70,6 +84,8 @@ public class SurfHttpDownloader implements Downloader {
 	private List<Future<Page>> downloads(List<SurfHttpRequest> requests) {
 		this.startTime = new Date();
 		SurfHttpClient httpClient = new SurfHttpClient();
+		httpClient.setProxy(this.proxy);
+		httpClient.setProxyProvider(this.proxyProvider);
 		List<Future<Page>> pages = new ArrayList<>();
 		requests.forEach(e->{
 			pages.add(threadPool.submit(new Callable<Page>() {
@@ -79,12 +95,15 @@ public class SurfHttpDownloader implements Downloader {
 					try {
 						page = httpClient.request(e);
 						page.setData(e.getData());
+						if (proxyProvider != null) {
+							proxyProvider.pageReturn(page.getUsedProxy(), page);
+						}
 						if (pageProcessor != null) {
 							if (site.getRetryTimes() > 0 && page.getStatusCode() != 200) {
 								logger.warn("[surfing]状态码 {}, 重试 {}, 重试次数还剩 {} 次, 消息体 {}", page.getStatusCode(), page.getUrl(), site.getRetryTimes(), page.getHtml().get());
 								final List<SurfHttpRequest> retryList = new ArrayList<>();
 								retryList.add(e);
-								new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1)).downloads();
+								new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1), proxy, proxyProvider).downloads();
 								retryPageCount.incrementAndGet();
 							} else if (page.getStatusCode() == 200) {
 								try {

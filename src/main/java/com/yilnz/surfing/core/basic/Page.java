@@ -1,5 +1,7 @@
 package com.yilnz.surfing.core.basic;
 
+import com.yilnz.surfing.core.proxy.HttpProxy;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,15 @@ public class Page {
     private Object data;
     private List<Header> headers = new ArrayList<>();
     private String rawText;
+    private HttpProxy usedProxy;
 
+    /**
+     * 内部使用
+     * @param usedProxy
+     */
+    public void _toUseProx(HttpProxy usedProxy) {
+        this.usedProxy = usedProxy;
+    }
 
     public String getHeadersText(){
         final StringBuilder sb = new StringBuilder();
@@ -18,6 +28,10 @@ public class Page {
             sb.append(h.getName()).append(":").append(h.getValue()).append("\n");
         }
         return sb.toString();
+    }
+
+    public HttpProxy getUsedProxy() {
+        return usedProxy;
     }
 
     public String getRawText() {
@@ -62,11 +76,18 @@ public class Page {
 
     public Html getHtml() {
         final Html html = this.html;
+        if (html == null) {
+            return null;
+        }
         html.setUrl(url);
         return html;
     }
 
     public void setHtml(Html html) {
         this.html = html;
+    }
+
+    public boolean isConnectionError(){
+        return this.statusCode == 0;
     }
 }
