@@ -3,7 +3,7 @@ package com.yilnz.surfing.core.proxy;
 import java.util.Arrays;
 import java.util.List;
 
-public class AutoProxyProvider extends HighAvaliabilityProxyProvider {
+public class AutoProxyProvider extends HighAvailabilityProxyProvider {
 
     public AutoProxyProvider() {
         super(null);

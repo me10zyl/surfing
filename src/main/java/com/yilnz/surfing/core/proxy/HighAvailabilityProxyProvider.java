@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class HighAvaliabilityProxyProvider extends LoadBalancingProxyProvider {
+public class HighAvailabilityProxyProvider extends LoadBalancingProxyProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(HighAvaliabilityProxyProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(HighAvailabilityProxyProvider.class);
 
     protected Map<HttpProxy, Integer> proxyErrorCount = new HashMap<>();
     protected Set<HttpProxy> removedProxyList = new HashSet<>();
@@ -16,7 +16,7 @@ public class HighAvaliabilityProxyProvider extends LoadBalancingProxyProvider {
     protected Set<HttpProxy> usedProxyList = new HashSet<>();
 
 
-    public HighAvaliabilityProxyProvider(List<HttpProxy> proxyList) {
+    public HighAvailabilityProxyProvider(List<HttpProxy> proxyList) {
         super(proxyList);
         if (this.getProxyList() != null) {
             reservedProxyList.addAll(this.getProxyList());

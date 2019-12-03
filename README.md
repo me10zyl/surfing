@@ -190,13 +190,73 @@ SurfSprider.download('/path/to/save/file/', 5, new FileDownloadProcessor() {
 }, null, urls.toArray(new String[]{}));
 ```
 
+# 代理
+
+设置代理分为4个类型：
++ 直接设置单个代理：所有请求都走这个代理
++ 负载均衡代理(LoadBalancingProxyProvider)：请求分别按顺序的使用代理集合中的某一个
++ 高可用代理(HighAvailabilityProxyProvider)：继承自负载均衡代理，请求分别按顺序的使用代理集合中的某一个,请求的代理超过5次未响应将被停止使用
++ 自动代理(AutoProxyProvider)：继承自高可用代理，在高可用代理的基础上，加上了文件缓存，将不可使用的代理写入缓存，下一次运行将不会继续使用
+
+功能性 ： `AutoProxyProvider > HighAvailabilityProxyProvider > LoadBalancingProxyProvider > setProxy`
+
+#### LoadBalancingProxyProviderTest
+```java
+     HttpProxy[] proxies = new HttpProxy[]{new HttpProxy("http://127.0.0.1:7777"), new HttpProxy("http://192.168.4.99:7777")};
+        final SurfHttpRequest request = new SurfHttpRequest();
+        request.setUrl("https://www.baidu.com");
+        request.setMethod("GET");
+        final SurfHttpRequest request2 = new SurfHttpRequest();
+        request2.setUrl("https://www.tieba.com");
+        request2.setMethod("GET");
+        SurfSprider.create().setRequests(Arrays.asList(request, request2)).setProxyProvider(new LoadBalancingProxyProvider(Arrays.asList(proxies))).setProcessor(new SurfPageProcessor() {
+            @Override
+            public void process(Page page) {
+                System.out.println(page.getHtml());
+            }
+        }).start();
+```
+
+#### HighAvaliabilityProxyProviderTest
+```java
+ HttpProxy[] proxies = new HttpProxy[]{new HttpProxy("http://127.0.0.1:7777"), new HttpProxy("http://192.168.4.99:7777")};
+        final SurfHttpRequest request = new SurfHttpRequest();
+        request.setUrl("https://www.baidu.com");
+        request.setMethod("GET");
+        final SurfHttpRequest request2 = new SurfHttpRequest();
+        request2.setUrl("https://www.tieba.com");
+        request2.setMethod("GET");
+        SurfSprider.create().setRequests(Arrays.asList(request, request2)).setProxyProvider(new HighAvaliabilityProxyProvider(Arrays.asList(proxies))).setProcessor(new SurfPageProcessor() {
+            @Override
+            public void process(Page page) {
+                System.out.println(page.getHtml());
+            }
+        }).start();
+```
+
+#### AutoProxyProviderTest
+```java
+HttpProxy[] proxies = new HttpProxy[]{new HttpProxy("http://127.0.0.1:7777"), new HttpProxy("http://192.168.4.99:7777")};
+        final SurfHttpRequest request = new SurfHttpRequest();
+        request.setUrl("https://www.baidu.com");
+        request.setMethod("GET");
+        final SurfHttpRequest request2 = new SurfHttpRequest();
+        request2.setUrl("https://www.tieba.com");
+        request2.setMethod("GET");
+        SurfSprider.create().setRequests(Arrays.asList(request, request2)).setProxyProvider(new AutoProxyProvider(Arrays.asList(proxies))).setProcessor(new SurfPageProcessor() {
+            @Override
+            public void process(Page page) {
+                System.out.println(page.getHtml());
+            }
+        }).start();
+```
 # 安装
 maven pom引用
 ```xml
 <dependency>
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.4</version>
 </dependency>
 ```
 
