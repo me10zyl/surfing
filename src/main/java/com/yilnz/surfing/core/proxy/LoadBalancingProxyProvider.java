@@ -10,14 +10,16 @@ import java.util.concurrent.atomic.LongAccumulator;
 
 public class LoadBalancingProxyProvider implements ProxyProvider {
 
-    private List<HttpProxy> proxyList = new ArrayList<>();
+    protected List<HttpProxy> proxyList = new ArrayList<>();
     protected int sequence = 0;
 
     public LoadBalancingProxyProvider(List<HttpProxy> proxyList) {
-        if (proxyList.size() == 0) {
+        if (proxyList != null && proxyList.size() == 0) {
             throw new NoProxyException("[surfing]没有任何可用的代理");
         }
-        this.proxyList.addAll(proxyList);
+        if (proxyList != null) {
+            this.proxyList.addAll(proxyList);
+        }
     }
 
     public List<HttpProxy> getProxyList() {

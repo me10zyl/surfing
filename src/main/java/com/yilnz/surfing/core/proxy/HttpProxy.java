@@ -12,6 +12,7 @@ public class HttpProxy{
    public static HttpProxy RANDOM_PROXY = new HttpProxy("-1", -1);
 
    public HttpProxy(String proxyString){
+       proxyString = proxyString.trim();
        final int i = proxyString.indexOf("://");
        if (i != -1) {
            this.schema = proxyString.substring(0, i);

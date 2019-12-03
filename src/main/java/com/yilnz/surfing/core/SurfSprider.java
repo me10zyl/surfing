@@ -70,6 +70,17 @@ public class SurfSprider {
 	}
 
 	/**
+	 * 阻塞型请求 - GET
+	 *
+	 * @param request the request
+	 * @return the page
+	 */
+	public static Page get(SurfHttpRequest request) {
+		request.setMethod("GET");
+		return SurfSprider.create().addRequest(request).request();
+	}
+
+	/**
 	 * 非阻塞型请求 - 多线程批量下载文件
 	 * @param basePath 文件下载目录
 	 * @param threadnum 最大线程数

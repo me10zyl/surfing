@@ -46,6 +46,9 @@ public class RegexSelector extends Selector {
             }
             groups.add(group);
         }
+        if (groups.size() == 0) {
+            return null;
+        }
         return groups;
     }
 }

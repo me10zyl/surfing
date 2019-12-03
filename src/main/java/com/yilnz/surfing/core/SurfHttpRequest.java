@@ -14,12 +14,34 @@ public class SurfHttpRequest {
     private Map<String, String> bodyParams = new HashMap<>();
     private HeaderGenerator headerGenerator;
     private Object data;
+    private Integer connectTimeout;
+    private boolean ignoreCookie = true;
+
+    public boolean isIgnoreCookie() {
+        return ignoreCookie;
+    }
+
+    public void setIgnoreCookie(boolean ignoreCookie) {
+        this.ignoreCookie = ignoreCookie;
+    }
+
+    public Integer getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(Integer connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
 
     public SurfHttpRequest() {
     }
 
     public SurfHttpRequest(Site site) {
         setHeaders(site.getHeaders());
+    }
+
+    public SurfHttpRequest(String url) {
+        this.url = url;
     }
 
 

@@ -42,11 +42,11 @@ public class PlainText extends AbstractSelectable {
     public Selectable select(Selector selector) {
         final List<String> selectList = selector.selectList(this.text.get(0));
         if (selectList == null) {
-            if(this instanceof Html){
+           /* if(this instanceof Html){
                 logger.warn("[surfing]选择结果为空 {} {} {}", ((Html)this).getUrl(), selector, this.text.get(0));
             }else{
                 logger.warn("[surfing]选择结果为空 {} {}", selector, this.text.get(0));
-            }
+            }*/
 
             return null;
         }

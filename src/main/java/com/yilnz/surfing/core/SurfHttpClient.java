@@ -79,7 +79,14 @@ public class SurfHttpClient {
     }
 
     public Page request(SurfHttpRequest request){
-        RequestConfig globalConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
+        final RequestConfig.Builder custom = RequestConfig.custom();
+        if (request.isIgnoreCookie()) {
+            custom.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
+        }
+        if (request.getConnectTimeout() != null) {
+            custom.setSocketTimeout(Math.toIntExact(request.getConnectTimeout()));
+        }
+        RequestConfig globalConfig = custom.build();
         //final HttpClientBuilder builder = HttpClientBuilder.create();
         final HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(globalConfig);
         boolean useProxy = false;
