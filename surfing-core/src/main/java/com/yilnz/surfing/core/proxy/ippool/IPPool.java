@@ -37,7 +37,7 @@ public class IPPool {
             final Html html = SurfSprider.get(request).getHtml();
             final Integer pageSize = html.select(Selectors.$("#PageList a:nth-last-of-type(2)")).getInt();
             final Random random = new Random();
-            int ranPage = random.nextInt(pageSize + 1);
+            int ranPage = random.nextInt(pageSize) + 1;
             return extractProxyListFromURL("http://www.66ip.cn/" + ranPage + ".html", "#main");
         } catch (Exception e) {
             logger.error("[surfing]get ip66 error", e);
@@ -47,7 +47,7 @@ public class IPPool {
 
     public static List<HttpProxy> getXici() {
         try {
-            return extractProxyListFromURL("https://www.xicidaili.com/", "#ip_list");
+            return extractProxyListFromURL("https://www.xicidaili.com/", "#ip_list", 1, 2);
         } catch (Exception e) {
             logger.error("[surfing]get xici error", e);
         }
@@ -55,6 +55,10 @@ public class IPPool {
     }
 
     public static List<HttpProxy> extractProxyListFromURL(String url, String tableCssSelector) {
+        return extractProxyListFromURL(url, tableCssSelector, 0, 1);
+    }
+
+    public static List<HttpProxy> extractProxyListFromURL(String url, String tableCssSelector, int ipIndex, int portIndex) {
         final SurfHttpRequest request = new SurfHttpRequest();
         request.setMethod("GET");
         request.setUrl(url);
@@ -75,9 +79,9 @@ public class IPPool {
         final List<Selectable> nodes = page.getHtml().select(Selectors.$(tableCssSelector + " tr:nth-of-type(n+2)")).nodes();
         List<HttpProxy> httpHosts = new ArrayList<>();
         for (Selectable node : nodes) {
-            final Selectable td = node.select(Selectors.regex("<td>(.+)</td>", 1));
+            final Selectable td = node.select(Selectors.regex("<td.*?>(.*?)</td>", 1));
             if (td != null) {
-                httpHosts.add(new HttpProxy(td.nodes().get(0).get(), Integer.parseInt(td.nodes().get(1).get())));
+                httpHosts.add(new HttpProxy(td.nodes().get(ipIndex).get(), Integer.parseInt(td.nodes().get(portIndex).get())));
             }
         }
         return httpHosts;
@@ -162,9 +166,5 @@ public class IPPool {
             logger.error("[surfing]Properties load error", e);
         }
         return httpProxies;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(IPPool.getProxyList());
     }
 }

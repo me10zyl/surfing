@@ -5,14 +5,15 @@ import com.yilnz.surfing.core.proxy.ippool.IPPool;
 import com.yilnz.surfing.core.proxy.ippool.IPPoolProvider;
 
 import java.util.List;
+import java.util.Random;
 
-public class XiciIPPoolProvider implements IPPoolProvider {
+public class IP3366IPPoolProvider2 implements IPPoolProvider {
     @Override
     public List<HttpProxy> getProxyList() {
-        return IPPool.getXici();
+        return IPPool.extractProxyListFromURL("http://www.ip3366.net/?stype=1&page=" + (new Random().nextInt(10) + 1), "#list");
     }
 
     public static void main(String[] args) {
-        new XiciIPPoolProvider().test();
+        new IP3366IPPoolProvider2().test();
     }
 }

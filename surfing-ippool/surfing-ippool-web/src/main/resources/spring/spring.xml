@@ -5,4 +5,10 @@
        xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.alibaba.com/schema/stat http://www.alibaba.com/schema/stat.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
     <context:property-placeholder location="classpath:*.properties" />
+
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.XiciIPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP66IPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider2" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.KuaidailiIPPoolProvider" />
 </beans>

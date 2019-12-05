@@ -30,7 +30,8 @@ public class IPPoolService {
 
     @Autowired
     private List<IPPoolProvider> ipPoolProviderList;
-    private ExecutorService validatePool = Executors.newFixedThreadPool(25);
+    private ExecutorService validatePool = Executors.newFixedThreadPool(50);
+    private ExecutorService ipWebsitePool = Executors.newFixedThreadPool(25);
     @Autowired
     private StringRedisTemplate redisTemplate = new StringRedisTemplate();
     public static final String REDIS_KEY = "PROXY_IP_POOL";
@@ -40,41 +41,53 @@ public class IPPoolService {
     private int sequence = 0;
 
     public void injectIPListToRedis() {
+        List<Future<?>> ipGetFutrues = new ArrayList<>();
         for (IPPoolProvider ipPoolProvider : ipPoolProviderList) {
-            final List<HttpProxy> proxyList = ipPoolProvider.getProxyList();
-            logger.info("从{}中获取到{}个IP", ipPoolProvider.getClass().toString(), proxyList.size());
-            List<Future<Integer>> successSize = new ArrayList<>();
-            for (HttpProxy httpProxy : proxyList) {
-                final Future<Integer> submit = validatePool.submit(() -> {
-                    final Set<HttpProxy> allListFromRedis = getAllListFromRedis();
-                    if (!allListFromRedis.contains(httpProxy) && validate(httpProxy)) {
-                        pushToRedis(httpProxy);
-                        return 2;
-                    }
-                    if (getListFromRedis().contains(httpProxy)) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                successSize.add(submit);
-            }
-            int successCount = 0;
-            int newAddedCount = 0;
-            for (Future<Integer> booleanFuture : successSize) {
-                try {
-                    final Integer aBoolean = booleanFuture.get();
-                    if (aBoolean != null && aBoolean > 0) {
-                        successCount++;
-                        if (aBoolean == 2) {
-                            newAddedCount++;
+            final Future<?> ipGetFuture = ipWebsitePool.submit(() -> {
+                final List<HttpProxy> proxyList = ipPoolProvider.getProxyList();
+                logger.info("从{}中获取到{}个IP", ipPoolProvider.getClass().toString(), proxyList.size());
+                List<Future<Integer>> successSize = new ArrayList<>();
+                for (HttpProxy httpProxy : proxyList) {
+                    final Future<Integer> submit = validatePool.submit(() -> {
+                        final Set<HttpProxy> allListFromRedis = getAllListFromRedis();
+                        if (!allListFromRedis.contains(httpProxy) && validate(httpProxy)) {
+                            pushToRedis(httpProxy);
+                            return 2;
                         }
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.error("Futrue执行出错", e);
+                        if (getListFromRedis().contains(httpProxy)) {
+                            return 1;
+                        }
+                        return 0;
+
+                    });
+                    successSize.add(submit);
                 }
-            }
-            if (proxyList.size() > 0) {
-                logger.info("{}中有{}个IP可用，其中新增{}个", ipPoolProvider.getClass().toString(), successCount, newAddedCount);
+                int successCount = 0;
+                int newAddedCount = 0;
+                for (Future<Integer> booleanFuture : successSize) {
+                    try {
+                        final Integer aBoolean = booleanFuture.get();
+                        if (aBoolean != null && aBoolean > 0) {
+                            successCount++;
+                            if (aBoolean == 2) {
+                                newAddedCount++;
+                            }
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.error("Futrue执行出错", e);
+                    }
+                }
+                if (proxyList.size() > 0) {
+                    logger.info("{}中有{}个IP可用，其中新增{}个", ipPoolProvider.getClass().toString(), successCount, newAddedCount);
+                }
+            });
+            ipGetFutrues.add(ipGetFuture);
+        }
+        for (Future<?> ipGetFutrue : ipGetFutrues) {
+            try {
+                ipGetFutrue.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Futrue执行出错2", e);
             }
         }
     }
