@@ -1,0 +1,19 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div style="color:red">Hello, World!</div>
+    <button id="btn">click me!</button>
+    <a th:href="@{/druid}">druid</a>
+    <script>
+        window.onload = ()=>{
+            document.getElementById('btn').onclick = function(){
+                alert('be clicked');
+            }
+        }
+    </script>
+</body>
+</html>

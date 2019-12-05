@@ -5,8 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.yilnz</groupId>
-    <artifactId>surfing</artifactId>
-    <version>0.1.4</version>
+    <artifactId>surfing-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1.5</version>
+    <modules>
+        <module>surfing-ippool</module>
+        <module>surfing-core</module>
+    </modules>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -28,109 +33,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>us.codecraft</groupId>
-            <artifactId>xsoup</artifactId>
-            <version>0.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.11.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.57</version>
-        </dependency>
-        <dependency>
-            <groupId>org.brotli</groupId>
-            <artifactId>dec</artifactId>
-            <version>0.1.2</version>
-        </dependency>
-    </dependencies>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <scm>
-        <connection>scm:git:git://github.com/me10zyl/surfing.git</connection>
-        <developerConnection>scm:git:git@github.com:me10zyl/surfing.git</developerConnection>
-        <url>https://github.com/me10zyl/surfing</url>
-    </scm>
-
-    <developers>
-        <developer>
-            <name>yilnz</name>
-            <email>me10zyl@qq.com</email>
-            <url>https://www.yilnz.com</url>
-        </developer>
-    </developers>
-
-    <profiles>
-        <profile>
-            <id>local</id>
-            <distributionManagement>
-                <repository>
-                    <id>releases</id>
-                    <name>Releases</name>
-                    <url>http://192.168.4.13:8081/nexus/content/repositories/releases</url>
-                </repository>
-            </distributionManagement>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>sonatype-nexus-staging</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
