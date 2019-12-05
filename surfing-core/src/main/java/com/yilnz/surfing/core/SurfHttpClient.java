@@ -85,6 +85,8 @@ public class SurfHttpClient {
         }
         if (request.getConnectTimeout() != null) {
             custom.setSocketTimeout(Math.toIntExact(request.getConnectTimeout()));
+            custom.setConnectTimeout(Math.toIntExact(request.getConnectTimeout()));
+            custom.setConnectionRequestTimeout(Math.toIntExact(request.getConnectTimeout()));
         }
         RequestConfig globalConfig = custom.build();
         //final HttpClientBuilder builder = HttpClientBuilder.create();

@@ -13,8 +13,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class IPPoolService {
 
     @Autowired
     private List<IPPoolProvider> ipPoolProviderList;
-    private ExecutorService validatePool = Executors.newFixedThreadPool(50);
+    private ExecutorService validatePool;
     private ExecutorService ipWebsitePool = Executors.newFixedThreadPool(25);
     @Autowired
     private StringRedisTemplate redisTemplate = new StringRedisTemplate();
@@ -39,6 +41,11 @@ public class IPPoolService {
     public static final int MAX_IP_COUNT = 100;
     private static final Logger logger = LoggerFactory.getLogger(IPPoolService.class);
     private int sequence = 0;
+
+    @PostConstruct
+    public void init(){
+        validatePool = Executors.newCachedThreadPool();
+    }
 
     public void injectIPListToRedis() {
         List<Future<?>> ipGetFutrues = new ArrayList<>();
@@ -92,9 +99,29 @@ public class IPPoolService {
         }
     }
 
+    public static void main(String[] args) {
+        final ThreadPoolExecutorFactoryBean threadFactory = new ThreadPoolExecutorFactoryBean();
+        //threadFactory.setDaemon(true);
+        final ExecutorService executorService = Executors.newFixedThreadPool(1, threadFactory);
+        executorService.submit(()->{
+            Thread.sleep(5000);
+            System.out.println("hello");
+           return 1;
+        });
+        executorService.submit(()->{
+            Thread.sleep(5000);
+            System.out.println("hello2");
+            return 1;
+        });
+        System.out.println("hello end");
+        executorService.shutdown();
+        System.out.println("hello end2");
+    }
+
     @PreDestroy
     private void destroy() {
         validatePool.shutdownNow();
+        ipWebsitePool.shutdownNow();
     }
 
     public HttpProxy getOne() {
