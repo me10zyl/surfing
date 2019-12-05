@@ -49,10 +49,10 @@ public class IPPoolService {
                     final Set<HttpProxy> allListFromRedis = getAllListFromRedis();
                     if (!allListFromRedis.contains(httpProxy) && validate(httpProxy)) {
                         pushToRedis(httpProxy);
-                        return 1;
-                    }
-                    if(getListFromRedis().contains(httpProxy)){
                         return 2;
+                    }
+                    if (getListFromRedis().contains(httpProxy)) {
+                        return 1;
                     }
                     return 0;
                 });
@@ -86,19 +86,21 @@ public class IPPoolService {
 
     public HttpProxy getOne() {
         sequence = sequence % getRedisIPListSize();
-        return redisTemplate.execute(new RedisCallback<HttpProxy>() {
+        final HttpProxy httpProxy = redisTemplate.execute(new RedisCallback<HttpProxy>() {
             @Override
             public HttpProxy doInRedis(RedisConnection connection) throws DataAccessException {
                 final Set<byte[]> bytes = connection.zRange(REDIS_KEY.getBytes(), sequence, sequence + 1);
-                if(bytes != null && bytes.size() > 0) {
+                if (bytes != null && bytes.size() > 0) {
                     return new HttpProxy(new String(bytes.iterator().next()));
                 }
                 return null;
             }
         });
+        sequence++;
+        return httpProxy;
     }
 
-    public int getRedisIPListSize(){
+    public int getRedisIPListSize() {
         return redisTemplate.execute(new RedisCallback<Integer>() {
             @Override
             public Integer doInRedis(RedisConnection connection) throws DataAccessException {
@@ -123,7 +125,7 @@ public class IPPoolService {
         });
     }
 
-    public Set<HttpProxy> getAllListFromRedis(){
+    public Set<HttpProxy> getAllListFromRedis() {
         final Set<HttpProxy> listFromRedis = getListFromRedis();
         listFromRedis.addAll(redisTemplate.execute(new RedisCallback<Set<HttpProxy>>() {
             @Override
@@ -164,12 +166,6 @@ public class IPPoolService {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 connection.zRem(REDIS_KEY.getBytes(), e.toString().getBytes());
-                return null;
-            }
-        });
-        redisTemplate.execute(new RedisCallback<Object>() {
-            @Override
-            public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 connection.zRem(REDIS_KEY_2.getBytes(), e.toString().getBytes());
                 return null;
             }
@@ -181,13 +177,7 @@ public class IPPoolService {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
                 connection.zRem(REDIS_KEY.getBytes(), e.toString().getBytes());
-                return null;
-            }
-        });
-        redisTemplate.execute(new RedisCallback<Object>() {
-            @Override
-            public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                connection.zIncrBy(REDIS_KEY.getBytes(), 1, e.toString().getBytes());
+                connection.zIncrBy(REDIS_KEY_2.getBytes(), 1, e.toString().getBytes());
                 return null;
             }
         });
@@ -199,20 +189,19 @@ public class IPPoolService {
                 @Override
                 public Object doInRedis(RedisConnection connection) throws DataAccessException {
                     connection.zAdd(REDIS_KEY.getBytes(), i, proxy.toString().getBytes());
+                    connection.zRem(REDIS_KEY_2.getBytes(), proxy.toString().getBytes());
                     return null;
                 }
             });
-            redisTemplate.execute((RedisCallback<? extends Object>) (redisConnection) -> redisConnection.zRem(REDIS_KEY_2.getBytes(), proxy.toString().getBytes()));
-
-        }else{
+        } else {
             redisTemplate.execute(new RedisCallback<Object>() {
                 @Override
                 public Object doInRedis(RedisConnection connection) throws DataAccessException {
                     connection.zRem(REDIS_KEY.getBytes(), proxy.toString().getBytes());
+                    connection.zAdd(REDIS_KEY_2.getBytes(), i, proxy.toString().getBytes());
                     return null;
                 }
             });
-            redisTemplate.execute((RedisCallback<? extends Object>) (redisConnection) -> redisConnection.zAdd(REDIS_KEY_2.getBytes(), i, proxy.toString().getBytes()));
         }
 
     }

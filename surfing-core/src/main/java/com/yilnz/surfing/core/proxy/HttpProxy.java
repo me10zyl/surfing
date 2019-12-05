@@ -1,5 +1,6 @@
 package com.yilnz.surfing.core.proxy;
 
+import net.minidev.json.annotate.JsonIgnore;
 import org.apache.http.HttpHost;
 
 import java.util.Objects;

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Set;
+
 @Controller
 public class IPPoolController {
 
@@ -16,7 +18,18 @@ public class IPPoolController {
 
     @RequestMapping("/get_proxy")
     @ResponseBody
-    public HttpProxy get_proxy(){
-        return ipPoolService.getOne();
+    public String get_proxy(){
+        final HttpProxy proxy = ipPoolService.getOne();
+        if (proxy != null) {
+            return proxy.toString();
+        }
+        return null;
+    }
+
+    @RequestMapping("/list_proxy")
+    @ResponseBody
+    public String list_proxy(){
+        final Set<HttpProxy> listFromRedis = ipPoolService.getListFromRedis();
+        return listFromRedis.toString().replaceAll("\\[|\\]", "");
     }
 }

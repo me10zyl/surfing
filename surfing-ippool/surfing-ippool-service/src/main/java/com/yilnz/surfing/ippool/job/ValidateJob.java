@@ -47,22 +47,27 @@ public class ValidateJob {
         List<Future<?>> futures = new ArrayList<>();
         ipList.forEach(e->{
             final Future<?> submit = validatePool.submit(() -> {
-                final boolean validate = ipPoolService.validate(e);
-                if (!validate) {
-                    ipPoolService.addErrorCountRedis2(e);
-                    //次数大于阈值则删除
-                    if (ipPoolService.getErrorCountRedis(e) >= MAX_VALIDATE_FAIL_COUNT) {
-                        logger.info("代理不可用大于{}次，删除 {}", MAX_VALIDATE_FAIL_COUNT, e.toString());
-                        ipPoolService.delFromRedis(e);
-                       /* if(!ipPoolService.isRedisPoolFull()){
-                            logger.info("删除代理之后，代理池不满，开始注入IP_LIST_2");
-                            ipPoolService.injectIPListToRedis();
-                        }*/
+                try {
+                    logger.info("验证{}", e);
+                    final boolean validate = ipPoolService.validate(e);
+                    if (!validate) {
+                        ipPoolService.addErrorCountRedis2(e);
+                        //次数大于阈值则删除
+                        if (ipPoolService.getErrorCountRedis(e) >= MAX_VALIDATE_FAIL_COUNT) {
+                            logger.info("代理不可用大于{}次，删除 {}", MAX_VALIDATE_FAIL_COUNT, e.toString());
+                            ipPoolService.delFromRedis(e);
+                           /* if(!ipPoolService.isRedisPoolFull()){
+                                logger.info("删除代理之后，代理池不满，开始注入IP_LIST_2");
+                                ipPoolService.injectIPListToRedis();
+                            }*/
+                        }
+                    } else {
+                        logger.info("代理{}验证通过，次数清零", e);
+                        //验证通过，次数清0
+                        ipPoolService.setErrorCountRedis(e, 0);
                     }
-                } else {
-                    logger.info("代理{}验证通过，次数清零", e);
-                    //验证通过，次数清0
-                    ipPoolService.setErrorCountRedis(e, 0);
+                }catch (Exception ee){
+                    logger.error("验证失败了", ee);
                 }
             });
             futures.add(submit);
