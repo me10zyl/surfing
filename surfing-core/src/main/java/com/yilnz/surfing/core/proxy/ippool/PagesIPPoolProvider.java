@@ -64,11 +64,15 @@ public  abstract class PagesIPPoolProvider implements IPPoolProvider {
         return all;
     }
 
+    public int[] getProxyFragmentIndex(){
+        return new int[]{0, 1, -1};
+    }
+
     protected void extract(ArrayList<HttpProxy> all, int i) {
         final String pagedURL = getPagedURL(i);
         final SurfHttpRequest customRequest = getCustomRequest();
         customRequest.setUrl(pagedURL);
-        List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), this.tableCssSelector, 0, 1, null);
+        List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), this.tableCssSelector, getProxyFragmentIndex()[0], getProxyFragmentIndex()[1],getProxyFragmentIndex()[2], null);
         all.addAll(httpProxies);
     }
 }

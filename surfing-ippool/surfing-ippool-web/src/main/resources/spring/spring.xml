@@ -7,6 +7,7 @@
     <context:property-placeholder location="classpath:*.properties" />
 
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.XiciIPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.XiciIPPoolProvider2" />
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP66IPPoolProvider" />
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider" />
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider2" />
