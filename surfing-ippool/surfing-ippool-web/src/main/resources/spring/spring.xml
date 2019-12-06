@@ -11,4 +11,7 @@
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider" />
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.IP3366IPPoolProvider2" />
     <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.KuaidailiIPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.FreeProxyListIPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.SSLProxiesIPPoolProvider" />
+    <bean class="com.yilnz.surfing.core.proxy.ippool.iplist.HideMyIPPoolProvider" />
 </beans>

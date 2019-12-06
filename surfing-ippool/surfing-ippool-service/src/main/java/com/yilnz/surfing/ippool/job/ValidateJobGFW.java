@@ -29,16 +29,16 @@ import java.util.concurrent.Future;
  */
 @Component
 @DisallowConcurrentExecution
-public class ValidateJob implements Job {
+public class ValidateJobGFW implements Job {
 
-    private Logger logger = LoggerFactory.getLogger(ValidateJob.class);
+    private Logger logger = LoggerFactory.getLogger(ValidateJobGFW.class);
 
     @Autowired
     private IPPoolService ipPoolService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        ipPoolService.setGFW(false);
+        ipPoolService.setGFW(true);
         ipPoolService.doValidateJob();
     }
 }
