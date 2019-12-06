@@ -35,7 +35,7 @@ public class CurlHeaderGenerator implements HeaderGenerator {
         while (matcher.find()) {
             headers.put(matcher.group(1), matcher.group(2));
         }
-        System.out.println(headers);
+        //System.out.println(headers);
         return headers;
     }
 }

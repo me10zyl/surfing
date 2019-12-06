@@ -5,6 +5,7 @@ import com.yilnz.surfing.core.SurfSprider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.header.generators.BulkHeaderGenerator;
 import com.yilnz.surfing.core.proxy.HttpProxy;
+import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.selectors.Selectors;
 import org.assertj.core.groups.Tuple;
 
@@ -25,6 +26,10 @@ public  abstract class PagesIPPoolProvider implements IPPoolProvider {
     }
 
     public abstract String getPagedURL(int page);
+
+    public ProxyProvider getProxyProvider(){
+        return null;
+    }
 
     public SurfHttpRequest getCustomRequest(){
         final SurfHttpRequest request = new SurfHttpRequest();
@@ -48,16 +53,26 @@ public  abstract class PagesIPPoolProvider implements IPPoolProvider {
     @Override
     public List<HttpProxy> getProxyList() {
         final Random random = new Random();
-        int ranPage = random.nextInt(assumPageCount - willBeCrawledPage) + 1;
+        int ranPage = 0;
+        if (willBeCrawledPage != -1) {
+            ranPage = random.nextInt(assumPageCount - willBeCrawledPage) + 1;
+        }
         final ArrayList<HttpProxy> all = new ArrayList<>();
-        for( int i = ranPage;i <= ranPage + willBeCrawledPage;i++) {
-            final String pagedURL = getPagedURL(i);
-            final SurfHttpRequest customRequest = getCustomRequest();
-            customRequest.setUrl(pagedURL);
-            List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, this.tableCssSelector, 0, 1);
-            System.out.println("run...." + i + "," + httpProxies.size());
-            all.addAll(httpProxies);
+        if (willBeCrawledPage == -1) {
+            extract(all, 0);
+        }else {
+            for (int i = ranPage; i <= ranPage + willBeCrawledPage; i++) {
+                extract(all, i);
+            }
         }
         return all;
+    }
+
+    private void extract(ArrayList<HttpProxy> all, int i) {
+        final String pagedURL = getPagedURL(i);
+        final SurfHttpRequest customRequest = getCustomRequest();
+        customRequest.setUrl(pagedURL);
+        List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), this.tableCssSelector, 0, 1);
+        all.addAll(httpProxies);
     }
 }

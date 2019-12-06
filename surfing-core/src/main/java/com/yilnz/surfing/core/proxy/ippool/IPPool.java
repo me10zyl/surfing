@@ -7,6 +7,7 @@ import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.exception.NoProxyException;
 import com.yilnz.surfing.core.header.generators.BulkHeaderGenerator;
 import com.yilnz.surfing.core.proxy.HttpProxy;
+import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selectors;
 import org.slf4j.Logger;
@@ -75,11 +76,15 @@ public class IPPool {
                 "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8\n" +
                 "Cookie: _free_proxy_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFVEkiJTNkNjg3NjA0Y2Y3ZmRlM2RlYzQyMGI0M2I5ZTQ2N2E5BjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMStiWFVMcERRbDN4UDZqV1RTZ0dmQjBuMU5ROU5MT1FqWEFvWXNrZSt2Wk09BjsARg%3D%3D--b2b99afbab5a6ac508e7b1f2dc8c6f11071aa631; Hm_lvt_0cf76c77469e965d2957f0553e6ecf59=1575275614,1575275734,1575275738,1575275739; Hm_lpvt_0cf76c77469e965d2957f0553e6ecf59=1575344636\n" +
                 "If-None-Match: W/\"d1ccb5e3391d5b02cc58a5e389426f27\""));
-        return extractProxyListFromURL(request, tableCssSelector, ipIndex, portIndex);
+        return extractProxyListFromURL(request, null, tableCssSelector, ipIndex, portIndex);
     }
 
-    public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, String tableCssSelector, int ipIndex, int portIndex) {
-        final Page page = SurfSprider.create().addRequest(request).request();
+    public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, ProxyProvider proxyProvider, String tableCssSelector, int ipIndex, int portIndex) {
+        final SurfSprider surfSprider = SurfSprider.create();
+        if (proxyProvider != null) {
+            surfSprider.setProxyProvider(proxyProvider);
+        }
+        final Page page = surfSprider.addRequest(request).request();
         final List<Selectable> nodes = page.getHtml().select(Selectors.$(tableCssSelector + " tr:nth-of-type(n+2)")).nodes();
         List<HttpProxy> httpHosts = new ArrayList<>();
         for (Selectable node : nodes) {

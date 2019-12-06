@@ -1,5 +1,9 @@
 package com.yilnz.surfing.core.proxy;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.alibaba.fastjson.support.spring.PropertyPreFilters;
 import net.minidev.json.annotate.JsonIgnore;
 import org.apache.http.HttpHost;
 
@@ -9,6 +13,7 @@ public class HttpProxy{
    private String host;
    private int port;
    private String schema;
+   private boolean isOverGFW;
 
    public static HttpProxy RANDOM_PROXY = new HttpProxy("-1", -1);
 
@@ -35,6 +40,14 @@ public class HttpProxy{
         }
     }
 
+    public boolean isOverGFW() {
+        return isOverGFW;
+    }
+
+    public void setOverGFW(boolean overGFW) {
+        isOverGFW = overGFW;
+    }
+
     public HttpProxy(String host, int port) {
         this(host, port, null);
     }
@@ -51,11 +64,19 @@ public class HttpProxy{
         return schema;
     }
 
-    public HttpHost getHttpHost(){
+    public HttpHost _getHttpHost(){
         if (host.equals("-1") && port == -1) {
             return null;
         }
         return new HttpHost(host, port, schema);
+    }
+
+    public static HttpProxy fromJSON(String str){
+        return JSON.parseObject(str, HttpProxy.class);
+    }
+
+    public String toJSON(){
+        return JSON.toJSONString(this);
     }
 
     @Override

@@ -96,7 +96,7 @@ public class SurfHttpClient {
             if(proxy == HttpProxy.RANDOM_PROXY){
                 proxy = IPPool.randomProxy();
             }
-            httpClientBuilder.setProxy(proxy.getHttpHost());
+            httpClientBuilder.setProxy(proxy._getHttpHost());
             useProxy = true;
         }
         if (proxyProvider != null) {
@@ -105,11 +105,11 @@ public class SurfHttpClient {
             }else{
                 proxy = proxyProvider.getProxy();
             }
-            httpClientBuilder.setProxy(proxy.getHttpHost());
+            httpClientBuilder.setProxy(proxy._getHttpHost());
             useProxy = true;
         }
         if(useProxy){
-            logger.info("[surfing]使用代理:" + proxy.getHttpHost());
+            logger.info("[surfing]使用代理:" + proxy._getHttpHost());
         }
         final CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
         Page page = new Page();
