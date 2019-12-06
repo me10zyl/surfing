@@ -34,7 +34,7 @@ public class PremProxyIPPoolProvider implements IPPoolProvider {
                 public HttpProxy getProxy() {
                     return new HttpProxy("127.0.0.1", 7777);
                 }
-            }, "#proxylist", 0, -1);
+            }, "#proxylist", 0, -1, null);
     }
 
     public static void main(String[] args) {

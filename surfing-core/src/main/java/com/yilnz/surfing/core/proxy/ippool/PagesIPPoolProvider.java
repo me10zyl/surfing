@@ -1,13 +1,9 @@
 package com.yilnz.surfing.core.proxy.ippool;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfSprider;
-import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.header.generators.BulkHeaderGenerator;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
-import com.yilnz.surfing.core.selectors.Selectors;
-import org.assertj.core.groups.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,11 +64,11 @@ public  abstract class PagesIPPoolProvider implements IPPoolProvider {
         return all;
     }
 
-    private void extract(ArrayList<HttpProxy> all, int i) {
+    protected void extract(ArrayList<HttpProxy> all, int i) {
         final String pagedURL = getPagedURL(i);
         final SurfHttpRequest customRequest = getCustomRequest();
         customRequest.setUrl(pagedURL);
-        List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), this.tableCssSelector, 0, 1);
+        List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), this.tableCssSelector, 0, 1, null);
         all.addAll(httpProxies);
     }
 }

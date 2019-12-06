@@ -251,7 +251,7 @@ public class IPPoolService {
         }
         request.setMethod("GET");
         request.setHeaderGenerator(new ChromeHeaderGenerator());
-        request.setConnectTimeout(5000);
+        request.setConnectTimeout(10000);
         final Page page = SurfSprider.create().addRequest(request).setProxy(httpProxy).request();
         if (page.getStatusCode() == 200) {
             return true;

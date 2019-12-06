@@ -76,10 +76,14 @@ public class IPPool {
                 "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8\n" +
                 "Cookie: _free_proxy_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFVEkiJTNkNjg3NjA0Y2Y3ZmRlM2RlYzQyMGI0M2I5ZTQ2N2E5BjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMStiWFVMcERRbDN4UDZqV1RTZ0dmQjBuMU5ROU5MT1FqWEFvWXNrZSt2Wk09BjsARg%3D%3D--b2b99afbab5a6ac508e7b1f2dc8c6f11071aa631; Hm_lvt_0cf76c77469e965d2957f0553e6ecf59=1575275614,1575275734,1575275738,1575275739; Hm_lpvt_0cf76c77469e965d2957f0553e6ecf59=1575344636\n" +
                 "If-None-Match: W/\"d1ccb5e3391d5b02cc58a5e389426f27\""));
-        return extractProxyListFromURL(request, null, tableCssSelector, ipIndex, portIndex);
+        return extractProxyListFromURL(request, null, tableCssSelector, ipIndex, portIndex, null);
     }
 
-    public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, ProxyProvider proxyProvider, String tableCssSelector, int ipIndex, int portIndex) {
+    public interface TrHandler{
+        HttpProxy handleTr(Selectable tr, List<Selectable> tds);
+    }
+
+    public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, ProxyProvider proxyProvider, String tableCssSelector, int ipIndex, int portIndex, TrHandler trHandler) {
         final SurfSprider surfSprider = SurfSprider.create();
         if (proxyProvider != null) {
             surfSprider.setProxyProvider(proxyProvider);
@@ -90,10 +94,17 @@ public class IPPool {
         for (Selectable node : nodes) {
             final Selectable td = node.select(Selectors.regex("<td.*?>(.*?)</td>", 1));
             if (td != null) {
-                if (portIndex == -1) {
-                    httpHosts.add(new HttpProxy(td.nodes().get(ipIndex).get()));
+                if (trHandler != null) {
+                    final HttpProxy proxy = trHandler.handleTr(node, td.nodes());
+                    if (proxy != null) {
+                        httpHosts.add(proxy);
+                    }
                 }else {
-                    httpHosts.add(new HttpProxy(td.nodes().get(ipIndex).get(), Integer.parseInt(td.nodes().get(portIndex).get())));
+                    if (portIndex == -1) {
+                        httpHosts.add(new HttpProxy(td.nodes().get(ipIndex).get()));
+                    } else {
+                        httpHosts.add(new HttpProxy(td.nodes().get(ipIndex).get(), Integer.parseInt(td.nodes().get(portIndex).get())));
+                    }
                 }
             }
         }
