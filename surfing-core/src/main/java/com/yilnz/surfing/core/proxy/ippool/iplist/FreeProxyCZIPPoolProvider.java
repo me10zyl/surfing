@@ -21,7 +21,7 @@ public class FreeProxyCZIPPoolProvider extends StandardIPPoolProvider {
 
     @Override
     public String getPagedURL(int page) {
-        return "http://free-proxy.cz/en/";
+        return "http://free-proxy.cz/en/proxylist/country/all/http/ping/all";
     }
 
     @Override
