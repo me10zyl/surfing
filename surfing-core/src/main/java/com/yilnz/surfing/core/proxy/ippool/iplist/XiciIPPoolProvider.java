@@ -1,11 +1,6 @@
 package com.yilnz.surfing.core.proxy.ippool.iplist;
 
-import com.yilnz.surfing.core.proxy.HttpProxy;
-import com.yilnz.surfing.core.proxy.ippool.IPPool;
-import com.yilnz.surfing.core.proxy.ippool.IPPoolProvider;
 import com.yilnz.surfing.core.proxy.ippool.PagesIPPoolProvider;
-
-import java.util.List;
 
 public class XiciIPPoolProvider extends PagesIPPoolProvider {
     public XiciIPPoolProvider() {
