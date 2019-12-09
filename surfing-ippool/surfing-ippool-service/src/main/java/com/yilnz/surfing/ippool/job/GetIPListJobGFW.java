@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 /**
  *  一分钟一次的获取IP操作
  */
-@Component
 @DisallowConcurrentExecution
 public class GetIPListJobGFW implements Job {
 

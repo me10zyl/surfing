@@ -27,7 +27,6 @@ import java.util.concurrent.Future;
 /**
  * 每5秒检查一次IP池，如果IP失效则删除，如果没满则插入IP
  */
-@Component
 @DisallowConcurrentExecution
 public class ValidateJobGFW implements Job {
 
