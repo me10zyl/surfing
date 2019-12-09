@@ -42,7 +42,7 @@ public class QuartzConfig {
                 .build();
     }
 
-    @Bean
+
     public Trigger trigger2(@Qualifier("job2") JobDetail job){
         return TriggerBuilder.newTrigger().forJob(job)
                 .withIdentity("trigger2")
@@ -58,7 +58,7 @@ public class QuartzConfig {
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatForever().withIntervalInSeconds(20))
                 .build();
     }
-    @Bean
+
     public Trigger trigger4(@Qualifier("job4") JobDetail job){
         return TriggerBuilder.newTrigger().forJob(job)
                 .withIdentity("trigger4")
