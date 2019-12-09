@@ -61,7 +61,7 @@ public class HttpProxy{
     }
 
     public String getSchema() {
-        return schema;
+        return schema == null ? null : schema.toLowerCase();
     }
 
     public HttpHost _getHttpHost(){
@@ -96,6 +96,6 @@ public class HttpProxy{
 
     @Override
     public String toString() {
-        return schema + "://" + host + ":" + port;
+        return getSchema() + "://" + host + ":" + port;
     }
 }
