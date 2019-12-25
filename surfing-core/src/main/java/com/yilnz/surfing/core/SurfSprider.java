@@ -10,14 +10,22 @@ import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.tool.Tool;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -187,6 +195,10 @@ public class SurfSprider {
 		return this;
 	}
 
+	public List<SurfHttpRequest> getRequests() {
+		return this.requests;
+	}
+
 	public SurfSprider addRequest(SurfHttpRequest request) {
 		if(request.getMethod() == null){
 			throw new UnsupportedOperationException("[surfing]request method 不能为空");
@@ -208,6 +220,32 @@ public class SurfSprider {
 		return this;
 	}
 
+
+
+	private Page download(Downloader downloader) {
+		final List<Future<Page>> downloads = downloader.downloads();
+		Page page = null;
+		try {
+			page = downloads.get(0).get();
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error("[surfing]requestSync error", e);
+		}
+		return page;
+	}
+
+	/**
+	 * 重试
+	 * @return
+	 */
+	public Page retry(){
+		if(requests.size() == 0){
+			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
+		}
+		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
+
+		return download(downloader);
+	}
+
 	/**
 	 * 阻塞型请求 - 开始爬取
 	 * @return
@@ -219,14 +257,7 @@ public class SurfSprider {
 		if (downloader == null) {
 			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
 		}
-		final List<Future<Page>> downloads = downloader.downloads();
-		Page page = null;
-		try {
-			page = downloads.get(0).get();
-		} catch (InterruptedException | ExecutionException e) {
-			logger.error("[surfing]requestSync error", e);
-		}
-		return page;
+		return download(downloader);
 	}
 
 	/**
@@ -256,5 +287,36 @@ public class SurfSprider {
 				e.doWork(pageProcessor, pages);
 			});
 		}
+	}
+
+	public SurfSprider loadCookie(){
+		if (this.requests == null || this.requests.size() == 0) {
+			throw new UnsupportedOperationException("[surfing]must add request first when load cookie");
+		}
+		final String tmpDir = System.getProperty("java.io.tmpdir");
+		for (SurfHttpRequest request : this.requests) {
+			final String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+			try {
+				request.addHeader("Cookie", new String(Files.readAllBytes(Paths.get(tmpDir, base64))));
+			} catch (IOException e) {
+				//logger.error("[surfing]load cookie error.", e);
+			}
+		}
+		return this;
+	}
+
+	public void saveCookie() {
+		final String tmpDir = System.getProperty("java.io.tmpdir");
+		for (SurfHttpRequest request : this.requests) {
+			try {
+				final String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+				final FileOutputStream fos = new FileOutputStream(new File(tmpDir, base64));
+				fos.write(request.getHeaders().get("Cookie").getBytes());
+				fos.close();
+			} catch (IOException e) {
+				logger.error("[surfing]save cookie error.", e);
+			}
+		}
+
 	}
 }

@@ -61,14 +61,14 @@ public class SurfRawClient {
                 res.append(str);
             }
             final Map<String, List<String>> headerFields = con.getHeaderFields();
-            final List<Header> headers = page.getHeaders();
+            final Map<String, String> headers = page.getHeaders();
             for (Map.Entry<String, List<String>> header : headerFields.entrySet()) {
-                headers.add(new Header(header.getKey(), header.getValue().toString().replaceAll("^\\[|\\]$", "")));
+                headers.put(header.getKey(), header.getValue().toString().replaceAll("^\\[|\\]$", ""));
             }
             StringBuilder headersText = new StringBuilder();
-            for(Header h : headers) {
-                if (h.getName() != null) {
-                    headersText.append(h.getName()).append(":").append(h.getValue()).append("\n");
+            for(Map.Entry<String, String> h : headers.entrySet()) {
+                if (h.getKey() != null) {
+                    headersText.append(h.getKey()).append(":").append(h.getValue()).append("\n");
                 }
             }
             page.setRawText(headerFields.get(null).toString().replaceAll("^\\[|\\]$", "") + "\n"  + headersText + "\n" + res.toString());

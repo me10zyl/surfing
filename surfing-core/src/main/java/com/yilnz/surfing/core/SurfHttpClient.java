@@ -185,7 +185,7 @@ public class SurfHttpClient {
         page.setHtml(new Html(EntityUtils.toString(entity)));
         final Header[] allHeaders = response.getAllHeaders();
         for (Header h : allHeaders) {
-            page.getHeaders().add(new com.yilnz.surfing.core.basic.Header(h.getName(), h.getValue()));
+            page.getHeaders().put(h.getName(), h.getValue());
         }
     }
 }

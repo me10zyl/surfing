@@ -3,14 +3,16 @@ package com.yilnz.surfing.core.basic;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Page {
     private Html html;
     private int statusCode;
     private String url;
     private Object data;
-    private List<Header> headers = new ArrayList<>();
+    private Map<String, String> headers = new HashMap<>();
     private String rawText;
     private HttpProxy usedProxy;
 
@@ -22,13 +24,13 @@ public class Page {
         this.usedProxy = usedProxy;
     }
 
-    public String getHeadersText(){
+    /*public String getHeadersText(){
         final StringBuilder sb = new StringBuilder();
         for(Header h : headers) {
             sb.append(h.getName()).append(":").append(h.getValue()).append("\n");
         }
         return sb.toString();
-    }
+    }*/
 
     public HttpProxy getUsedProxy() {
         return usedProxy;
@@ -42,11 +44,22 @@ public class Page {
         this.rawText = rawText;
     }
 
-    public List<Header> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(List<Header> headers) {
+    public String getHeader(String key){
+        String value = this.getHeaders().get(key);
+        if (value == null) {
+            value = this.getHeaders().get(key.toLowerCase());
+        }
+        if (value == null) {
+            value = this.getHeaders().get(key.toUpperCase());
+        }
+        return value;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
@@ -89,5 +102,10 @@ public class Page {
 
     public boolean isConnectionError(){
         return this.statusCode == 0;
+    }
+
+    @Override
+    public String toString() {
+        return "url=" + url + "，statusCode=" + statusCode;
     }
 }

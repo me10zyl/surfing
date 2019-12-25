@@ -126,6 +126,8 @@ public class SurfHttpDownloader implements Downloader {
 						}
 					}catch (Exception e){
 						logger.error("[surfing]request error", e);
+					}catch (Error e){
+						logger.error("[surfing]request fatal error", e);
 					}
 					return page;
 				}

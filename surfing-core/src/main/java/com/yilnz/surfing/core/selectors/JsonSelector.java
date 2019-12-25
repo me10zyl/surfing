@@ -33,7 +33,7 @@ public class JsonSelector extends Selector{
             return res;
         }
         List<String> arr = new ArrayList<>();
-        arr.add((String) read);
+        arr.add(String.valueOf(read));
         return arr;
     }
 }
