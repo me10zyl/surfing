@@ -257,7 +257,7 @@ maven pom引用
 <dependency>
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1.4</version>
+    <version>LATEST</version>
 </dependency>
 ```
 
