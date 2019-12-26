@@ -289,13 +289,16 @@ public class SurfSprider {
 		}
 	}
 
-	public SurfSprider loadCookie(){
+	public SurfSprider loadCookie(String key){
 		if (this.requests == null || this.requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]must add request first when load cookie");
 		}
 		final String tmpDir = System.getProperty("java.io.tmpdir");
 		for (SurfHttpRequest request : this.requests) {
-			final String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+			String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+			if (key != null) {
+				base64 = new String(Base64.encodeBase64(key.getBytes()));
+			}
 			try {
 				request.addHeader("Cookie", new String(Files.readAllBytes(Paths.get(tmpDir, base64))));
 			} catch (IOException e) {
@@ -305,11 +308,14 @@ public class SurfSprider {
 		return this;
 	}
 
-	public void saveCookie() {
+	public void saveCookie(String key) {
 		final String tmpDir = System.getProperty("java.io.tmpdir");
 		for (SurfHttpRequest request : this.requests) {
 			try {
-				final String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+				String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+				if (key != null) {
+					base64 = new String(Base64.encodeBase64(key.getBytes()));
+				}
 				final FileOutputStream fos = new FileOutputStream(new File(tmpDir, base64));
 				fos.write(request.getHeaders().get("Cookie").getBytes());
 				fos.close();

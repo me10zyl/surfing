@@ -7,17 +7,13 @@
     <groupId>com.yilnz</groupId>
     <artifactId>surfing-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.6</version>
+    <version>0.1.7</version>
     <modules>
         <module>surfing-ippool</module>
         <module>surfing-core</module>
     </modules>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+
 
     <description>An Easy WebSpider</description>
     

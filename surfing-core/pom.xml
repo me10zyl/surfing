@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>surfing-parent</artifactId>
-        <groupId>com.yilnz</groupId>
-        <version>0.1.6</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>${project.parent.version}</version>
+    <version>0.1.7</version>
 
     <dependencies>
         <dependency>
@@ -97,6 +97,16 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+        </profile>
+        <profile>
+            <id>prd</id>
+            <distributionManagement>
+                <repository>
+                    <id>releases</id>
+                    <name>Releases</name>
+                    <url>http://192.168.4.17:8081/nexus/content/repositories/releases</url>
+                </repository>
+            </distributionManagement>
         </profile>
         <profile>
             <id>sonatype-oss-release</id>
