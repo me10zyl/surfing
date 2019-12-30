@@ -116,7 +116,7 @@ public class SurfFileDownloader implements Downloader {
 					}
 					Files.copy(in, Paths.get(filepath), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e1) {
-					logger.error("[surfing]download error #1", e1);
+					logger.error("[surfing]getPage error #1", e1);
 					final InputStream errorStream = urlConnection.getErrorStream();
 					byte[] buffer = new byte[1024];
 					int len = -1;
@@ -125,7 +125,7 @@ public class SurfFileDownloader implements Downloader {
 						sb.append(new String(buffer, 0, len));
 					}
 					errorStream.close();
-					logger.error("[surfing]download error #2 {}", sb.toString());
+					logger.error("[surfing]getPage error #2 {}", sb.toString());
 				}finally {
 					if (in != null) {
 						in.close();

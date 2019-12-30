@@ -16,16 +16,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -96,7 +93,7 @@ public class SurfSprider {
 	 * @param fileNameRegex 文件下载正则，匹配URL，如 [^/]+?(?=/$|$|\?)
 	 * @param urls 多个请求地址
 	 */
-	public static void download(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
+	public static void getPage(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
 		for (int i = 0; i < urls.length; i++) {
 			final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -111,8 +108,8 @@ public class SurfSprider {
 		return downloadIfNotExist(filePath, url, null);
 	}
 
-	public static File download(String filePath, String url){
-		return download(filePath, url, null);
+	public static File getPage(String filePath, String url){
+		return getPage(filePath, url, null);
 	}
 
 	/**
@@ -126,16 +123,16 @@ public class SurfSprider {
 		if(file.exists()){
 			return file;
 		}
-		return download(filePath, url, site);
+		return getPage(filePath, url, site);
 	}
 
 	/**
-	 * 阻塞型请求 - 下载文件 例子. download("/tmp/" + FileUtil.getFileNameByUrl(url), url)
+	 * 阻塞型请求 - 下载文件 例子. getPage("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 * @param filePath 文件下载路径
 	 * @param url 请求地址
 	 * @return
 	 */
-	public static File download(String filePath, String url, Site site) {
+	public static File getPage(String filePath, String url, Site site) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest(site);
 		surfHttpRequest.setUrl(url);
@@ -222,7 +219,7 @@ public class SurfSprider {
 
 
 
-	private Page download(Downloader downloader) {
+	private Page getPage(Downloader downloader) {
 		final List<Future<Page>> downloads = downloader.downloads();
 		Page page = null;
 		try {
@@ -243,7 +240,7 @@ public class SurfSprider {
 		}
 		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
 
-		return download(downloader);
+		return getPage(downloader);
 	}
 
 	/**
@@ -257,13 +254,37 @@ public class SurfSprider {
 		if (downloader == null) {
 			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
 		}
-		return download(downloader);
+		return getPage(downloader);
+	}
+
+	/**
+	 * 阻塞型请求 - 开始爬取
+	 *
+	 * @return
+	 */
+	public List<Page> requests() {
+		if(requests.size() == 0){
+			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
+		}
+		if (downloader == null) {
+			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
+		}
+		final List<Future<Page>> downloads = downloader.downloads();
+		List<Page> pages = new ArrayList<>();
+		for (Future<Page> download : downloads) {
+			try {
+				pages.add(download.get());
+			} catch (InterruptedException | ExecutionException e) {
+				logger.error("[surfing]requestSync error", e);
+			}
+		}
+		return pages;
 	}
 
 	/**
 	 * 非阻塞型请求 - 开始爬取
 	 */
-	public void start() {
+	public List<Future<Page>> start() {
 		if(requests.size() == 0){
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
@@ -287,6 +308,8 @@ public class SurfSprider {
 				e.doWork(pageProcessor, pages);
 			});
 		}
+
+		return pages;
 	}
 
 	public SurfSprider loadCookie(String key){

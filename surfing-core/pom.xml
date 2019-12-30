@@ -11,7 +11,7 @@
 
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
 
     <properties>
         <repoAddr>private_maven_repo_url</repoAddr>
