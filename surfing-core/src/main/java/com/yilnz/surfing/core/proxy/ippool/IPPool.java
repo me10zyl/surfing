@@ -1,7 +1,7 @@
 package com.yilnz.surfing.core.proxy.ippool;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.exception.NoProxyException;
@@ -35,7 +35,7 @@ public class IPPool {
         try {
             final SurfHttpRequest request = new SurfHttpRequest("http://www.66ip.cn/index.html");
             request.setConnectTimeout(3000);
-            final Html html = SurfSprider.get(request).getHtml();
+            final Html html = SurfSpider.get(request).getHtml();
             final Integer pageSize = html.select(Selectors.$("#PageList a:nth-last-of-type(2)")).getInt();
             final Random random = new Random();
             int ranPage = random.nextInt(pageSize) + 1;
@@ -84,11 +84,11 @@ public class IPPool {
     }
 
     public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, ProxyProvider proxyProvider, String tableCssSelector, int ipIndex, int portIndex, int schemaIndex, TrHandler trHandler) {
-        final SurfSprider surfSprider = SurfSprider.create();
+        final SurfSpider surfSprider = SurfSpider.create();
         if (proxyProvider != null) {
             surfSprider.setProxyProvider(proxyProvider);
         }
-        final Page page = surfSprider.addRequest(request).request();
+        final Page page = surfSprider.addRequest(request).request().get(0);
         final List<Selectable> nodes = page.getHtml().select(Selectors.$(tableCssSelector + " tr:nth-of-type(n+2)")).nodes();
         List<HttpProxy> httpHosts = new ArrayList<>();
         for (Selectable node : nodes) {

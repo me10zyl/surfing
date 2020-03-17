@@ -16,8 +16,17 @@ public class SurfHttpRequest {
     private Object data;
     private Integer connectTimeout;
     private boolean ignoreCookie = true;
+    private Site site;
 
-    public boolean isIgnoreCookie() {
+	public Site getSite() {
+		return site;
+	}
+
+	public void setSite(Site site) {
+		this.site = site;
+	}
+
+	public boolean isIgnoreCookie() {
         return ignoreCookie;
     }
 

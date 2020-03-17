@@ -3,7 +3,7 @@ package com.yilnz.surfing.examples.advance;
 import com.yilnz.surfing.core.Site;
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessor;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Page;
 
 public class SpriderTest4 {
@@ -18,14 +18,10 @@ public class SpriderTest4 {
         request3.setUrl("http://www.baidu.com/s");
         request3.addParams("wd", "java");
         request3.setMethod("GET");
-        SurfSprider.create().
+        SurfSpider.create().
                 addRequest(request)
                 .addRequest(request2)
-                .addRequest(request3).thread(5).setProcessor(new SurfPageProcessor() {
-            @Override
-            public Site getSite() {
-                return Site.me().setRetryTimes(2).setSleepTime(500);
-            }
+                .addRequest(request3).thread(5).setSite(Site.me().setRetryTimes(2).setSleepTime(500)).setProcessor(new SurfPageProcessor() {
 
             @Override
             public void process(Page page) {

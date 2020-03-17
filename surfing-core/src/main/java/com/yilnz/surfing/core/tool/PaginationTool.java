@@ -2,7 +2,7 @@ package com.yilnz.surfing.core.tool;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessor;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.selectors.Selector;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class PaginationTool implements Tool {
 	public void doWork(SurfPageProcessor pageProcessor, List<Future<Page>> pages){
 		try {
 			int lastPage = pages.get(0).get().getHtml().select(lastPageSelector).getInt();
-			final SurfSprider surfSprider = SurfSprider.create();
+			final SurfSpider surfSprider = SurfSpider.create();
 			for(int i = step; i < lastPage; i+=step){
 				SurfHttpRequest r = new SurfHttpRequest();
 				r.setMethod("GET");

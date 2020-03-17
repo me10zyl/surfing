@@ -6,7 +6,7 @@ import java.util.Map;
 public class Site {
 
 	private int sleepTime = 50;
-	private int retryTimes = 2;
+	private int retryTimes = 0;
 	private Map<String, String> headers = new HashMap<>();
 
 	private Site(){

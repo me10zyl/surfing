@@ -1,7 +1,7 @@
 package com.yilnz.surfing.core.proxy.ippool.iplist;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ippool.IPPool;
@@ -18,7 +18,7 @@ public class IP66IPPoolProvider implements IPPoolProvider {
     public List<HttpProxy> getProxyList() {
         final SurfHttpRequest request = new SurfHttpRequest("http://www.66ip.cn/index.html");
         request.setConnectTimeout(3000);
-        final Html html = SurfSprider.get(request).getHtml();
+        final Html html = SurfSpider.get(request).getHtml();
         final Integer pageSize = html.select(Selectors.$("#PageList a:nth-last-of-type(2)")).getInt();
         final Random random = new Random();
         int ranPage = random.nextInt(pageSize - pageCount) + 1;

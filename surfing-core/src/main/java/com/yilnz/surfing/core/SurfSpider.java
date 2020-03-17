@@ -26,21 +26,22 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class SurfSprider {
+public class SurfSpider {
 	private List<SurfHttpRequest> requests;
 	private Downloader downloader;
 	private int threadnum;
-	private static final Logger logger = LoggerFactory.getLogger(SurfSprider.class);
+	private static final Logger logger = LoggerFactory.getLogger(SurfSpider.class);
 	private SurfPageProcessor pageProcessor;
 	private List<Tool> tools = new ArrayList<>();
 	private HttpProxy proxy;
 	private ProxyProvider proxyProvider;
+	private Site site = Site.me();
 
 	public ProxyProvider getProxyProvider() {
 		return proxyProvider;
 	}
 
-	public SurfSprider setProxyProvider(ProxyProvider proxyProvider) {
+	public SurfSpider setProxyProvider(ProxyProvider proxyProvider) {
 		this.proxyProvider = proxyProvider;
 		return this;
 	}
@@ -49,17 +50,17 @@ public class SurfSprider {
 		return proxy;
 	}
 
-	public SurfSprider setProxy(HttpProxy proxy) {
+	public SurfSpider setProxy(HttpProxy proxy) {
 		this.proxy = proxy;
 		return this;
 	}
 
-	private SurfSprider() {
+	private SurfSpider() {
 		this.requests = new ArrayList<>();
 	}
 
-	public static SurfSprider create() {
-		return new SurfSprider();
+	public static SurfSpider create() {
+		return new SurfSpider();
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class SurfSprider {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("GET");
-		return SurfSprider.create().addRequest(surfHttpRequest).request();
+		return SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class SurfSprider {
 	 */
 	public static Page get(SurfHttpRequest request) {
 		request.setMethod("GET");
-		return SurfSprider.create().addRequest(request).request();
+		return SurfSpider.create().addRequest(request).request().get(0);
 	}
 
 	/**
@@ -164,20 +165,20 @@ public class SurfSprider {
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("POST");
 		surfHttpRequest.setBody(body);
-		return SurfSprider.create().addRequest(surfHttpRequest).request();
+		return SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
 	}
 
 	public static Page postJSON(String url, Object jsonObject){
 		final SurfHttpRequest post = new SurfHttpRequestBuilder(url, "POST").json(jsonObject).build();
-		return SurfSprider.create().addRequest(post).request();
+		return SurfSpider.create().addRequest(post).request().get(0);
 	}
 
 	public void setTools(List<Tool> tools) {
 		this.tools = tools;
 	}
 
-	public static SurfSprider create(Tool... tool){
-		final SurfSprider surfSprider = new SurfSprider();
+	public static SurfSpider create(Tool... tool){
+		final SurfSpider surfSprider = new SurfSpider();
 		List<Tool> tools = new ArrayList<>();
 		for (int i = 0; i < tool.length; i++) {
 			tools.add(tool[i]);
@@ -187,7 +188,7 @@ public class SurfSprider {
 	}
 
 
-	public SurfSprider setRequests(List<SurfHttpRequest> requests) {
+	public SurfSpider setRequests(List<SurfHttpRequest> requests) {
 		this.requests = requests;
 		return this;
 	}
@@ -196,7 +197,7 @@ public class SurfSprider {
 		return this.requests;
 	}
 
-	public SurfSprider addRequest(SurfHttpRequest request) {
+	public SurfSpider addRequest(SurfHttpRequest request) {
 		if(request.getMethod() == null){
 			throw new UnsupportedOperationException("[surfing]request method 不能为空");
 		}
@@ -207,12 +208,12 @@ public class SurfSprider {
 		return this;
 	}
 
-	public SurfSprider thread(int threadnum) {
+	public SurfSpider thread(int threadnum) {
 		this.threadnum = threadnum;
 		return this;
 	}
 
-	public SurfSprider setProcessor(SurfPageProcessor processor) {
+	public SurfSpider setProcessor(SurfPageProcessor processor) {
 		this.pageProcessor = processor;
 		return this;
 	}
@@ -247,31 +248,10 @@ public class SurfSprider {
 	 * 阻塞型请求 - 开始爬取
 	 * @return
 	 */
-	public Page request(){
-		if(requests.size() == 0){
-			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
-		}
-		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
-		}
-		return getPage(downloader);
-	}
-
-	/**
-	 * 阻塞型请求 - 开始爬取
-	 *
-	 * @return
-	 */
-	public List<Page> requests() {
-		if(requests.size() == 0){
-			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
-		}
-		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
-		}
-		final List<Future<Page>> downloads = downloader.downloads();
+	public List<Page> request(){
+		final List<Future<Page>> start = start();
 		List<Page> pages = new ArrayList<>();
-		for (Future<Page> download : downloads) {
+		for (Future<Page> download : start) {
 			try {
 				pages.add(download.get());
 			} catch (InterruptedException | ExecutionException e) {
@@ -279,6 +259,15 @@ public class SurfSprider {
 			}
 		}
 		return pages;
+	}
+
+	public Site getSite() {
+		return site;
+	}
+
+	public SurfSpider setSite(Site site) {
+		this.site = site;
+		return this;
 	}
 
 	/**
@@ -289,7 +278,7 @@ public class SurfSprider {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, pageProcessor.getSite(), this.proxy, this.proxyProvider);
+			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, site, this.proxy, this.proxyProvider);
 
 			//JMX监控
 			try {
@@ -312,7 +301,7 @@ public class SurfSprider {
 		return pages;
 	}
 
-	public SurfSprider loadCookie(String key){
+	public SurfSpider loadCookie(String key){
 		if (this.requests == null || this.requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]must add request first when load cookie");
 		}

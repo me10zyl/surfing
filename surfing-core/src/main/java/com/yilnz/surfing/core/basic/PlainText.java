@@ -1,9 +1,6 @@
 package com.yilnz.surfing.core.basic;
 
-import com.yilnz.surfing.core.selectors.AbstractSelectable;
-import com.yilnz.surfing.core.selectors.JsonSelector;
-import com.yilnz.surfing.core.selectors.Selectable;
-import com.yilnz.surfing.core.selectors.Selector;
+import com.yilnz.surfing.core.selectors.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +69,9 @@ public class PlainText extends AbstractSelectable {
         return new PlainText(selectList);
     }
 
+    public Json selectJson(String jsonPath){
+		return (Json) this.select(Selectors.jsonPath(jsonPath));
+	}
 
     @Override
     public List<Selectable> nodes() {

@@ -1,5 +1,6 @@
 package com.yilnz.surfing.core.basic;
 
+import com.alibaba.fastjson.JSON;
 import com.yilnz.surfing.core.selectors.Selectable;
 
 import java.util.ArrayList;
@@ -23,4 +24,8 @@ public class Json extends PlainText {
         }
         return plainTexts;
     }
+
+    public <T> T toObject(Class<T> clazz){
+    	return JSON.parseObject(get(), clazz);
+	}
 }

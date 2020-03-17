@@ -1,8 +1,6 @@
 package com.yilnz.surfing.core.proxy.ippool.iplist;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfSprider;
-import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.proxy.ippool.IPPool;

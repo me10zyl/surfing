@@ -88,6 +88,7 @@ public class SurfHttpDownloader implements Downloader {
 		httpClient.setProxyProvider(this.proxyProvider);
 		List<Future<Page>> pages = new ArrayList<>();
 		requests.forEach(e->{
+			final Site currentSite = (site == null) ? e.getSite() : site;
 			pages.add(threadPool.submit(new Callable<Page>() {
 				@Override
 				public Page call() {
@@ -99,11 +100,11 @@ public class SurfHttpDownloader implements Downloader {
 							proxyProvider.pageReturn(page.getUsedProxy(), page);
 						}
 						if (pageProcessor != null) {
-							if (site.getRetryTimes() > 0 && page.getStatusCode() != 200) {
-								logger.warn("[surfing]状态码 {}, 重试 {}, 重试次数还剩 {} 次, 消息体 {}", page.getStatusCode(), page.getUrl(), site.getRetryTimes(), page.getHtml().get());
+							if (currentSite.getRetryTimes() > 0 && page.getStatusCode() != 200) {
+								logger.warn("[surfing]状态码 {}, 重试 {}, 重试次数还剩 {} 次, 消息体 {}", page.getStatusCode(), page.getUrl(), currentSite.getRetryTimes(), page.getHtml().get());
 								final List<SurfHttpRequest> retryList = new ArrayList<>();
 								retryList.add(e);
-								new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(site.getRetryTimes() - 1), proxy, proxyProvider).downloads();
+								new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(currentSite).setRetryTimes(currentSite.getRetryTimes() - 1), proxy, proxyProvider).downloads();
 								retryPageCount.incrementAndGet();
 							} else if (page.getStatusCode() == 200) {
 								try {
@@ -113,7 +114,7 @@ public class SurfHttpDownloader implements Downloader {
 								}
 								successPageCount.incrementAndGet();
 								totalPageCount.incrementAndGet();
-							} else if (site.getRetryTimes() <= 0) {
+							} else if (currentSite.getRetryTimes() <= 0) {
 								try {
 									pageProcessor.processError(page);
 								} catch (Exception e) {
@@ -133,7 +134,7 @@ public class SurfHttpDownloader implements Downloader {
 				}
 			}));
 			try {
-				Thread.sleep(site.getSleepTime());
+				Thread.sleep(currentSite.getSleepTime());
 			} catch (InterruptedException e1) {
 				logger.info("[surfing]sleep error", e1);
 			}
