@@ -270,6 +270,19 @@ public class SurfSpider {
 		return this;
 	}
 
+	public void stopNow(){
+		if(downloader == null){
+			return;
+		}
+		if(downloader instanceof SurfHttpDownloader){
+			logger.info("[surfing]立刻停止继续爬取数据");
+			((SurfHttpDownloader)downloader).stopNow();
+			downloader = null;
+		}else{
+			logger.warn("[surfing]只有Http请求才能立刻停止");
+		}
+	}
+
 	/**
 	 * 非阻塞型请求 - 开始爬取
 	 */

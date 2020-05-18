@@ -11,7 +11,8 @@
     <modules>
         <module>surfing-ippool</module>
         <module>surfing-core</module>
-    </modules>
+		<module>surfing-selenium</module>
+	</modules>
 
 
 

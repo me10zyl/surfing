@@ -81,6 +81,10 @@ public class SurfHttpDownloader implements Downloader {
 		threadPool = Executors.newFixedThreadPool(threadNum);
 	}
 
+	public void stopNow(){
+		threadPool.shutdownNow();
+	}
+
 	private List<Future<Page>> downloads(List<SurfHttpRequest> requests) {
 		this.startTime = new Date();
 		SurfHttpClient httpClient = new SurfHttpClient();
