@@ -6,5 +6,9 @@ public interface SurfPageProcessorInterface {
 
     void process(Page page);
 
-    void processError(Page page);
+	/**
+	 * try times <= 0 (status code != 200)
+	 * @param page
+	 */
+	void processError(Page page);
 }

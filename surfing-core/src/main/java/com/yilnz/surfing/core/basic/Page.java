@@ -1,20 +1,29 @@
 package com.yilnz.surfing.core.basic;
 
+import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Page {
     private Html html;
     private int statusCode;
     private String url;
     private Object data;
-    private Map<String, String> headers = new HashMap<>();
+    private List<Header> headers = new ArrayList<>();
     private String rawText;
     private HttpProxy usedProxy;
+    private SurfHttpRequest request;
+
+
+    public String getCookie(){
+		List<Header> headers = this.getHeaders("Set-Cookie");
+		return headers.stream().map(e-> e.getValue().split(";")[0]).collect(Collectors.joining(";"));
+	}
 
     /**
      * 内部使用
@@ -32,7 +41,15 @@ public class Page {
         return sb.toString();
     }*/
 
-    public HttpProxy getUsedProxy() {
+	public SurfHttpRequest getRequest() {
+		return request;
+	}
+
+	public void setRequest(SurfHttpRequest request) {
+		this.request = request;
+	}
+
+	public HttpProxy getUsedProxy() {
         return usedProxy;
     }
 
@@ -44,24 +61,23 @@ public class Page {
         this.rawText = rawText;
     }
 
-    public Map<String, String> getHeaders() {
+    public List<Header> getHeaders() {
         return headers;
     }
 
     public String getHeader(String key){
-        String value = this.getHeaders().get(key);
-        if (value == null) {
-            value = this.getHeaders().get(key.toLowerCase());
-        }
-        if (value == null) {
-            value = this.getHeaders().get(key.toUpperCase());
-        }
-        return value;
+		List<Header> headers = getHeaders(key);
+		if(headers == null || headers.size() == 0){
+			return null;
+		}
+		return headers.get(0).toString();
     }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
+	public List<Header> getHeaders(String key){
+		return this.getHeaders().stream().filter(e->{
+			return key.equals(e.getName()) || key.toLowerCase().equals(e.getName()) || key.toUpperCase().equals(e.getName());
+		}).collect(Collectors.toList());
+	}
 
     public Object getData() {
         return data;

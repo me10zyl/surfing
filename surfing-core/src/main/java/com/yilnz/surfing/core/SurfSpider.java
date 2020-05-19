@@ -7,6 +7,7 @@ import com.yilnz.surfing.core.downloader.filedownload.DownloadFile;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
 import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
+import com.yilnz.surfing.core.plugin.ReLogin;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.tool.Tool;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -36,6 +38,7 @@ public class SurfSpider {
 	private HttpProxy proxy;
 	private ProxyProvider proxyProvider;
 	private Site site = Site.me();
+	private ReLogin reLogin;
 
 	public ProxyProvider getProxyProvider() {
 		return proxyProvider;
@@ -73,6 +76,18 @@ public class SurfSpider {
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("GET");
 		return SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
+	}
+
+	/**
+	 * 阻塞型请求 - GET
+	 * @return
+	 */
+	public static Page getWithLogin(String url, ReLogin reLogin){
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		surfHttpRequest.setUrl(url);
+		surfHttpRequest.setMethod("GET");
+		SurfSpider surfSpider = SurfSpider.create();
+		return surfSpider.addRequest(surfHttpRequest).tryLoginWhenFailed(reLogin).request().get(0);
 	}
 
 	/**
@@ -239,7 +254,7 @@ public class SurfSpider {
 		if(requests.size() == 0){
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
-		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider);
+		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider, this.reLogin);
 
 		return getPage(downloader);
 	}
@@ -291,7 +306,7 @@ public class SurfSpider {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		if (downloader == null) {
-			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, site, this.proxy, this.proxyProvider);
+			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, site, this.proxy, this.proxyProvider, this.reLogin);
 
 			//JMX监控
 			try {
@@ -314,10 +329,20 @@ public class SurfSpider {
 		return pages;
 	}
 
+	public SurfSpider tryLoginWhenFailed(ReLogin reLogin){
+		this.reLogin = reLogin;
+		if (this.requests == null || this.requests.size() == 0) {
+			throw new UnsupportedOperationException("[surfing]must add request first before invoking tryLoginWhenFailed");
+		}
+		loadCookie(reLogin.getCookieKey());
+		return this;
+	}
+
 	public SurfSpider loadCookie(String key){
 		if (this.requests == null || this.requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]must add request first when load cookie");
 		}
+		logger.info("[surfing]（本地缓存）从本地读取cookieKey={}用于登录", key);
 		final String tmpDir = System.getProperty("java.io.tmpdir");
 		for (SurfHttpRequest request : this.requests) {
 			String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
@@ -325,7 +350,15 @@ public class SurfSpider {
 				base64 = new String(Base64.encodeBase64(key.getBytes()));
 			}
 			try {
-				request.addHeader("Cookie", new String(Files.readAllBytes(Paths.get(tmpDir, base64))));
+				byte[] bytes = Files.readAllBytes(Paths.get(tmpDir, base64));
+				StringTokenizer tokenizer = new StringTokenizer(new String(bytes, "UTF-8"), "\n");
+				while (tokenizer.hasMoreElements()){
+					String line = (String) tokenizer.nextElement();
+					int indexOfEq = line.indexOf("=");
+					String name = line.substring(0, indexOfEq);
+					String value = line.substring(indexOfEq + 1);
+					request.addHeader(name, value);
+				}
 			} catch (IOException e) {
 				//logger.error("[surfing]load cookie error.", e);
 			}
@@ -333,7 +366,7 @@ public class SurfSpider {
 		return this;
 	}
 
-	public void saveCookie(String key) {
+	/*public void saveCookie(String key) {
 		final String tmpDir = System.getProperty("java.io.tmpdir");
 		for (SurfHttpRequest request : this.requests) {
 			try {
@@ -349,5 +382,5 @@ public class SurfSpider {
 			}
 		}
 
-	}
+	}*/
 }

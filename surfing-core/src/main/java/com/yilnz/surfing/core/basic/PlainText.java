@@ -1,6 +1,9 @@
 package com.yilnz.surfing.core.basic;
 
 import com.yilnz.surfing.core.selectors.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,11 +69,22 @@ public class PlainText extends AbstractSelectable {
         if(selector instanceof JsonSelector){
             return new Json(selectList);
         }
+        if(selector instanceof CssSelector){
+        	return new HtmlNode(selectList);
+		}
         return new PlainText(selectList);
     }
 
     public Json selectJson(String jsonPath){
 		return (Json) this.select(Selectors.jsonPath(jsonPath));
+	}
+
+	public HtmlNode selectCss(String cssQuery){
+    	return (HtmlNode) this.select(Selectors.$(cssQuery));
+	}
+
+	public HtmlNode selectXPath(String xpath){
+    	return (HtmlNode) this.select(Selectors.xpath(xpath));
 	}
 
     @Override
