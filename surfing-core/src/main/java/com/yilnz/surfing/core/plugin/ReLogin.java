@@ -6,5 +6,4 @@ public interface ReLogin {
 	CookieProvider getCookie(Page page);
 	boolean isLoginSuccess(Page page);
 	String getCookieKey();
-	default String[] getCustomHeaderNames(){return null;}
 }
