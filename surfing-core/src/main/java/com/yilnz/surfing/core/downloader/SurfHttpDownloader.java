@@ -35,6 +35,7 @@ public class SurfHttpDownloader implements Downloader {
 	private AtomicInteger successPageCount = new AtomicInteger(0);
 	private AtomicInteger errorPageCount = new AtomicInteger(0);
 	private AtomicInteger retryPageCount = new AtomicInteger(0);
+	private AtomicInteger threadSeq = new AtomicInteger(0);
 	private Date startTime;
 	private HttpProxy proxy;
 	private ProxyProvider proxyProvider;
@@ -85,11 +86,11 @@ public class SurfHttpDownloader implements Downloader {
 	}
 
 	private void initComponents(){
-		ThreadGroup threadGroup = new ThreadGroup("surfspider-http-downloader");
+		ThreadGroup threadGroup = new ThreadGroup("surfspider-http-downloader-thread");
 		threadPool = Executors.newFixedThreadPool(threadNum, new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
-				Thread thread = new Thread(threadGroup, r);
+				Thread thread = new Thread(threadGroup, r, threadGroup.getName() + "-max(" + threadNum +")-site(" + site + ")"+ "-" + threadSeq.incrementAndGet());
 				thread.setDaemon(false);
 				return thread;
 			}

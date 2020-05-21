@@ -357,6 +357,9 @@ public class SurfSpider {
 			pageUrl.setData(i);
 			surfSpider.addRequest(pageUrl);
 		}
+		if(surfSpider.threadnum == 0){
+			surfSpider.thread(5);
+		}
 		return surfSpider.setProcessor(new SurfPageProcessor() {
 			@Override
 			public void process(Page page) {

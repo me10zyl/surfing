@@ -6,8 +6,14 @@ import java.util.Map;
 public class Site {
 
 	private int sleepTime = 50;
-	private int retryTimes = 0;
+	private int retryTimes = 2;
 	private Map<String, String> headers = new HashMap<>();
+
+	@Override
+	public String toString() {
+		return "sleepTime=" + sleepTime +
+				",retryTimes=" + retryTimes;
+	}
 
 	private Site(){
 
