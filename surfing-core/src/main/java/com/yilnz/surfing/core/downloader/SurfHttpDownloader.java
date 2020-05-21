@@ -85,7 +85,15 @@ public class SurfHttpDownloader implements Downloader {
 	}
 
 	private void initComponents(){
-		threadPool = Executors.newFixedThreadPool(threadNum);
+		ThreadGroup threadGroup = new ThreadGroup("surfspider-http-downloader");
+		threadPool = Executors.newFixedThreadPool(threadNum, new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread thread = new Thread(threadGroup, r);
+				thread.setDaemon(false);
+				return thread;
+			}
+		});
 	}
 
 	public void stopNow(){
@@ -105,6 +113,7 @@ public class SurfHttpDownloader implements Downloader {
 				public Page call() {
 					Page page = null;
 					try {
+						//System.out.println("请求 " + e.getData() + "页数");
 						page = httpClient.request(e);
 						page.setData(e.getData());
 						page.setRequest(e);
@@ -161,7 +170,7 @@ public class SurfHttpDownloader implements Downloader {
 		if (reLogin != null && !reLogin.isLoginSuccess(page)) {
 			CookieProvider cookieProvider = reLogin.getCookie(page);
 			String cookie = cookieProvider.getCookies();
-			logger.info("[surfing]尝试重新登录中...Cookie={},customHeaders={}", cookie, cookieProvider.getCustomHeaders());
+			logger.info("[surfing]登录失败，重新登录中...");
 			if(cookie == null && cookieProvider.getCustomHeaders().size() == 0){
 				logger.info("[surfing]重新登录需要的Cookie为空,或者customHeaders.size()==0，请检查getCookie是否返回正确的值, 强制停止爬虫");
 				stopNow();
@@ -190,7 +199,7 @@ public class SurfHttpDownloader implements Downloader {
 				return page;
 			}
 			saveCookie(reLogin.getCookieKey(), request);
-			logger.info("[surfing]登录成功，存储Cookie={}", cookie);
+			logger.info("[surfing]登录成功，存储Cookie={},customHeaders={}", cookie, cookieProvider.getCustomHeaders());
 			return page1;
 		}
 		return page;

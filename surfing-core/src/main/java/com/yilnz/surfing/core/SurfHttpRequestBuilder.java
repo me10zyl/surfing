@@ -30,6 +30,10 @@ public class SurfHttpRequestBuilder {
 		return this;
 	}
 
+	public static SurfHttpRequestBuilder create(String url, String method){
+		return new SurfHttpRequestBuilder(url, method);
+	}
+
 	public SurfHttpRequest build(){
 		final SurfHttpRequest req = new SurfHttpRequest();
 		req.setMethod(this.method);

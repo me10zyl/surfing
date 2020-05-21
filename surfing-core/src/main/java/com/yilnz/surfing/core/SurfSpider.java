@@ -1,5 +1,6 @@
 package com.yilnz.surfing.core;
 
+import com.yilnz.surfing.core.basic.Header;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.downloader.Downloader;
 import com.yilnz.surfing.core.downloader.SurfHttpDownloader;
@@ -7,6 +8,7 @@ import com.yilnz.surfing.core.downloader.filedownload.DownloadFile;
 import com.yilnz.surfing.core.downloader.filedownload.FileDownloadProcessor;
 import com.yilnz.surfing.core.downloader.filedownload.SurfFileDownloader;
 import com.yilnz.surfing.core.monitor.SpiderHttpStatus;
+import com.yilnz.surfing.core.plugin.PaginationClz;
 import com.yilnz.surfing.core.plugin.ReLogin;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
@@ -17,14 +19,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,6 +39,7 @@ public class SurfSpider {
 	private ProxyProvider proxyProvider;
 	private Site site = Site.me();
 	private ReLogin reLogin;
+	private List<Header> defaultRequestHeaders;
 
 	public ProxyProvider getProxyProvider() {
 		return proxyProvider;
@@ -68,10 +69,11 @@ public class SurfSpider {
 
 	/**
 	 * 阻塞型请求 - GET
+	 *
 	 * @param url 请求地址
 	 * @return
 	 */
-	public static Page get(String url){
+	public static Page get(String url) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("GET");
@@ -80,9 +82,10 @@ public class SurfSpider {
 
 	/**
 	 * 阻塞型请求 - GET
+	 *
 	 * @return
 	 */
-	public static Page getWithLogin(String url, ReLogin reLogin){
+	public static Page getWithLogin(String url, ReLogin reLogin) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("GET");
@@ -103,11 +106,12 @@ public class SurfSpider {
 
 	/**
 	 * 非阻塞型请求 - 多线程批量下载文件
-	 * @param basePath 文件下载目录
-	 * @param threadnum 最大线程数
+	 *
+	 * @param basePath              文件下载目录
+	 * @param threadnum             最大线程数
 	 * @param fileDownloadProcessor 文件下载完成回调
-	 * @param fileNameRegex 文件下载正则，匹配URL，如 [^/]+?(?=/$|$|\?)
-	 * @param urls 多个请求地址
+	 * @param fileNameRegex         文件下载正则，匹配URL，如 [^/]+?(?=/$|$|\?)
+	 * @param urls                  多个请求地址
 	 */
 	public static void getPage(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
@@ -120,23 +124,24 @@ public class SurfSpider {
 		downloader.downloadFiles(basePath);
 	}
 
-	public static File downloadIfNotExist(String filePath, String url){
+	public static File downloadIfNotExist(String filePath, String url) {
 		return downloadIfNotExist(filePath, url, null);
 	}
 
-	public static File getPage(String filePath, String url){
+	public static File getPage(String filePath, String url) {
 		return getPage(filePath, url, null);
 	}
 
 	/**
 	 * 阻塞型请求 - 在文件不存在的时候下载  例子. downloadIfNotExist("/tmp/" + FileUtil.getFileNameByUrl(url), url)
+	 *
 	 * @param filePath 文件下载路径
-	 * @param url 请求地址
+	 * @param url      请求地址
 	 * @return
 	 */
-	public static File downloadIfNotExist(String filePath, String url, Site site){
+	public static File downloadIfNotExist(String filePath, String url, Site site) {
 		final File file = new File(filePath);
-		if(file.exists()){
+		if (file.exists()) {
 			return file;
 		}
 		return getPage(filePath, url, site);
@@ -144,8 +149,9 @@ public class SurfSpider {
 
 	/**
 	 * 阻塞型请求 - 下载文件 例子. getPage("/tmp/" + FileUtil.getFileNameByUrl(url), url)
+	 *
 	 * @param filePath 文件下载路径
-	 * @param url 请求地址
+	 * @param url      请求地址
 	 * @return
 	 */
 	public static File getPage(String filePath, String url, Site site) {
@@ -167,15 +173,14 @@ public class SurfSpider {
 	}
 
 
-
-
 	/**
 	 * 阻塞型请求 - POST
-	 * @param url 请求地址
+	 *
+	 * @param url  请求地址
 	 * @param body 请求体
 	 * @return
 	 */
-	public static Page post(String url, String body){
+	public static Page post(String url, String body) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
 		surfHttpRequest.setMethod("POST");
@@ -183,7 +188,7 @@ public class SurfSpider {
 		return SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
 	}
 
-	public static Page postJSON(String url, Object jsonObject){
+	public static Page postJSON(String url, Object jsonObject) {
 		final SurfHttpRequest post = new SurfHttpRequestBuilder(url, "POST").json(jsonObject).build();
 		return SurfSpider.create().addRequest(post).request().get(0);
 	}
@@ -192,7 +197,7 @@ public class SurfSpider {
 		this.tools = tools;
 	}
 
-	public static SurfSpider create(Tool... tool){
+	public static SurfSpider create(Tool... tool) {
 		final SurfSpider surfSprider = new SurfSpider();
 		List<Tool> tools = new ArrayList<>();
 		for (int i = 0; i < tool.length; i++) {
@@ -213,10 +218,10 @@ public class SurfSpider {
 	}
 
 	public SurfSpider addRequest(SurfHttpRequest request) {
-		if(request.getMethod() == null){
+		if (request.getMethod() == null) {
 			throw new UnsupportedOperationException("[surfing]request method 不能为空");
 		}
-		if(request.getUrl() == null){
+		if (request.getUrl() == null) {
 			throw new UnsupportedOperationException("[surfing]request URL 不能为空");
 		}
 		this.requests.add(request);
@@ -234,7 +239,6 @@ public class SurfSpider {
 	}
 
 
-
 	private Page getPage(Downloader downloader) {
 		final List<Future<Page>> downloads = downloader.downloads();
 		Page page = null;
@@ -248,10 +252,11 @@ public class SurfSpider {
 
 	/**
 	 * 重试
+	 *
 	 * @return
 	 */
-	public Page retry(){
-		if(requests.size() == 0){
+	public Page retry() {
+		if (requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
 		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider, this.reLogin);
@@ -261,9 +266,10 @@ public class SurfSpider {
 
 	/**
 	 * 阻塞型请求 - 开始爬取
+	 *
 	 * @return
 	 */
-	public List<Page> request(){
+	public List<Page> request() {
 		final List<Future<Page>> start = start();
 		List<Page> pages = new ArrayList<>();
 		for (Future<Page> download : start) {
@@ -285,15 +291,15 @@ public class SurfSpider {
 		return this;
 	}
 
-	public void stopNow(){
-		if(downloader == null){
+	public void stopNow() {
+		if (downloader == null) {
 			return;
 		}
-		if(downloader instanceof SurfHttpDownloader){
+		if (downloader instanceof SurfHttpDownloader) {
 			logger.info("[surfing]立刻停止继续爬取数据");
-			((SurfHttpDownloader)downloader).stopNow();
+			((SurfHttpDownloader) downloader).stopNow();
 			downloader = null;
-		}else{
+		} else {
 			logger.warn("[surfing]只有Http请求才能立刻停止");
 		}
 	}
@@ -302,9 +308,21 @@ public class SurfSpider {
 	 * 非阻塞型请求 - 开始爬取
 	 */
 	public List<Future<Page>> start() {
-		if(requests.size() == 0){
+		if (requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]没有任何Request,请调用addRequest方法");
 		}
+		//设置默认HeaderList
+		if (this.defaultRequestHeaders != null) {
+			requests.forEach(e->{
+				this.defaultRequestHeaders.forEach(ee->{
+					if(!e.getHeaders().containsKey(ee.getName())) {
+						e.addHeader(ee.getName(), ee.getValue());
+					}
+				});
+
+			});
+		}
+
 		if (downloader == null) {
 			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, site, this.proxy, this.proxyProvider, this.reLogin);
 
@@ -320,8 +338,8 @@ public class SurfSpider {
 		}
 		final List<Future<Page>> pages = downloader.downloads();
 
-		if(this.tools != null){
-			this.tools.forEach(e->{
+		if (this.tools != null) {
+			this.tools.forEach(e -> {
 				e.doWork(pageProcessor, pages);
 			});
 		}
@@ -329,40 +347,71 @@ public class SurfSpider {
 		return pages;
 	}
 
-	public SurfSpider tryLoginWhenFailed(ReLogin reLogin){
-		this.reLogin = reLogin;
-		if (this.requests == null || this.requests.size() == 0) {
-			throw new UnsupportedOperationException("[surfing]must add request first before invoking tryLoginWhenFailed");
+
+	public static List<Future<Page>> startPagination(PaginationClz clz) {
+		int pageCount = clz.getPageCount();
+		logger.info("[surfing]获取总页数 " + pageCount + " ");
+		SurfSpider surfSpider = clz.surfSpider();
+		for (int i = 1; i <= pageCount; i++) {
+			SurfHttpRequest pageUrl = clz.getPageUrl(i);
+			pageUrl.setData(i);
+			surfSpider.addRequest(pageUrl);
 		}
+		return surfSpider.setProcessor(new SurfPageProcessor() {
+			@Override
+			public void process(Page page) {
+				clz.handlePage().process(page, (Integer) page.getData());
+			}
+
+			@Override
+			public void processError(Page page) {
+				clz.handlePage().processError(page, (Integer) page.getData());
+			}
+		}).start();
+	}
+
+	public SurfSpider tryLoginWhenFailed(ReLogin reLogin) {
+		this.reLogin = reLogin;
+		/*if (this.requests == null || this.requests.size() == 0) {
+			throw new UnsupportedOperationException("[surfing]must add request first before invoking tryLoginWhenFailed");
+		}*/
 		loadCookie(reLogin.getCookieKey());
 		return this;
 	}
 
-	public SurfSpider loadCookie(String key){
-		if (this.requests == null || this.requests.size() == 0) {
+	public void setDefaultRequestHeaders(List<Header> headerList) {
+		defaultRequestHeaders = headerList;
+	}
+
+	public SurfSpider loadCookie(String key) {
+		/*if (this.requests == null || this.requests.size() == 0) {
 			throw new UnsupportedOperationException("[surfing]must add request first when load cookie");
-		}
-		logger.info("[surfing]（本地缓存）从本地读取cookieKey={}用于登录", key);
+		}*/
 		final String tmpDir = System.getProperty("java.io.tmpdir");
-		for (SurfHttpRequest request : this.requests) {
-			String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
-			if (key != null) {
-				base64 = new String(Base64.encodeBase64(key.getBytes()));
+
+		//for (SurfHttpRequest request : this.requests) {
+		//String base64 = new String(Base64.encodeBase64(request.getUrl().getBytes()));
+		//if (key != null) {
+		String base64 = new String(Base64.encodeBase64(key.getBytes()));
+		//}
+		try {
+			Path path = Paths.get(tmpDir, base64);
+			logger.info("[surfing]（本地缓存）从本地读取cookieKey={}用于登录，path={}", key, path);
+			byte[] bytes = Files.readAllBytes(path);
+			StringTokenizer tokenizer = new StringTokenizer(new String(bytes, "UTF-8"), "\n");
+			List<Header> defaultHeaderList = new ArrayList<>();
+			while (tokenizer.hasMoreElements()) {
+				String line = (String) tokenizer.nextElement();
+				int indexOfEq = line.indexOf("=");
+				String name = line.substring(0, indexOfEq);
+				String value = line.substring(indexOfEq + 1);
+				defaultHeaderList.add(new Header(name, value));
 			}
-			try {
-				byte[] bytes = Files.readAllBytes(Paths.get(tmpDir, base64));
-				StringTokenizer tokenizer = new StringTokenizer(new String(bytes, "UTF-8"), "\n");
-				while (tokenizer.hasMoreElements()){
-					String line = (String) tokenizer.nextElement();
-					int indexOfEq = line.indexOf("=");
-					String name = line.substring(0, indexOfEq);
-					String value = line.substring(indexOfEq + 1);
-					request.addHeader(name, value);
-				}
-			} catch (IOException e) {
-				//logger.error("[surfing]load cookie error.", e);
-			}
+			setDefaultRequestHeaders(defaultHeaderList);
+		} catch (IOException e) {
+			//logger.error("[surfing]load cookie error.", e);
 		}
+		//}
 		return this;
 	}
 
