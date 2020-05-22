@@ -17,7 +17,7 @@ public class TieziConverter extends Converter<Tiezi> {
 	@Override
 	public Tiezi convert(Selectable selectable) {
 		Tiezi tiezi = new Tiezi();
-		//TM.toTmpFile(selectable);
+		//TM.toTmpFile(selectable.filter(Filters.HTML_UNESCAPE).get());
 		tiezi.setTitle(selectable.selectCss("a.j_th_tit").filter(Filters.TRIM).get());
 		tiezi.setAuthor(selectable.select(Selectors.$(".tb_icon_author", "title")).filter(Filters.TRIM).get());
 		tiezi.setUrl(selectable.selectCss(".j_th_tit").get());

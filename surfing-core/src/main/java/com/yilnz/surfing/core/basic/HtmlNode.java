@@ -1,8 +1,10 @@
 package com.yilnz.surfing.core.basic;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 
 import java.util.List;
 

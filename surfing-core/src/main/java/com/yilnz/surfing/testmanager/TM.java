@@ -15,12 +15,12 @@ public class TM {
 
 	private static final String txt = "/var/log/TM/html.txt";
 
-	public static void toTmpFile(Selectable selectable){
+	public static void toTmpFile(String str){
 		File f = new File(txt);
 		try {
 			if(System.currentTimeMillis() - f.lastModified() > 60 * 1000) {
 				FileOutputStream fos = new FileOutputStream(f);
-				fos.write(selectable.get().getBytes());
+				fos.write(str.getBytes());
 				fos.close();
 			}
 		} catch (IOException e) {
