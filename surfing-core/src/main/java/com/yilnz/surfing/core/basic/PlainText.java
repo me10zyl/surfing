@@ -1,9 +1,8 @@
 package com.yilnz.surfing.core.basic;
 
+import com.yilnz.surfing.core.converter.Converter;
 import com.yilnz.surfing.core.selectors.*;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.yilnz.surfing.core.filter.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,4 +94,20 @@ public class PlainText extends AbstractSelectable {
         }
         return plainTexts;
     }
+
+    public Selectable filter(Filter... filters){
+
+		for (Filter filter : filters) {
+			for (int i =0 ;i< this.nodes().size();i++) {
+				Object o = filter.doFilter(this.nodes().get(i).get());
+				this.text.set(i, (String)o);
+			}
+		}
+
+    	return this;
+	}
+
+	public <T> List<T> toList(Converter<T> converter){
+		return converter.toList(this);
+	}
 }
