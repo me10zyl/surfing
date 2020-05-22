@@ -25,7 +25,7 @@ public class TestTieba {
 			@Override
 			public int getPageCount() {
 				final SurfHttpRequest request1 = new SurfHttpRequest();
-				request1.setUrl("http://tieba.baidu.com/f?kw=方舟生存进化&fr=index");
+				request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
 				request1.setMethod("get");
 				final Page request = SurfSpider.create().addRequest(request1).request().get(0);
 				final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
@@ -35,7 +35,7 @@ public class TestTieba {
 
 			@Override
 			public SurfHttpRequest getPageUrl(int page) {
-				return SurfHttpRequestBuilder.create("https://tieba.baidu.com/f?kw=方舟生存进化&amp;ie=utf-8&pn=" + page * 50, "GET").build();
+				return SurfHttpRequestBuilder.create("https://tieba.baidu.com/f?kw=java&amp;ie=utf-8&pn=" + page * 50, "GET").build();
 			}
 
 			@Override
@@ -46,7 +46,7 @@ public class TestTieba {
 						logger.info("当前页：" + currentPage);
 						List<Tiezi> tiezis = page.getHtml().toList(new TieziConverter(Selectors.$(".j_thread_list")));
 						for (Tiezi tiezi : tiezis) {
-							System.out.println(tiezi.getTitle() + " " + tiezi.getAuthor());
+							System.out.println(tiezi.getTitle() + " " + tiezi.getAuthor() + " " + tiezi.getUrl());
 						}
 					}
 

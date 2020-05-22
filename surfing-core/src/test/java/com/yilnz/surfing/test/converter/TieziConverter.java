@@ -20,7 +20,7 @@ public class TieziConverter extends Converter<Tiezi> {
 		//TM.toTmpFile(selectable.filter(Filters.HTML_UNESCAPE).get());
 		tiezi.setTitle(selectable.selectCss("a.j_th_tit").filter(Filters.TRIM).get());
 		tiezi.setAuthor(selectable.select(Selectors.$(".tb_icon_author", "title")).filter(Filters.TRIM).get());
-		tiezi.setUrl(selectable.selectCss(".j_th_tit").get());
+		tiezi.setUrl("https://tieba.baidu.com" + selectable.select(Selectors.$(".j_th_tit", "href")).get());
 		return tiezi;
 	}
 
