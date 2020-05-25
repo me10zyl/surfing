@@ -16,15 +16,15 @@ public class SurfHttpRequest {
     private Object data;
     private Integer connectTimeout;
     private boolean ignoreCookie = true;
-    private Site site;
+//    private Site site;
 
-	public Site getSite() {
+	/*public Site getSite() {
 		return site;
 	}
 
 	public void setSite(Site site) {
 		this.site = site;
-	}
+	}*/
 
 	public boolean isIgnoreCookie() {
         return ignoreCookie;
@@ -45,9 +45,9 @@ public class SurfHttpRequest {
     public SurfHttpRequest() {
     }
 
-    public SurfHttpRequest(Site site) {
+   /* public SurfHttpRequest(Site site) {
         setHeaders(site.getHeaders());
-    }
+    }*/
 
     public SurfHttpRequest(String url) {
         this.url = url;
@@ -72,15 +72,11 @@ public class SurfHttpRequest {
 
     public void setHeaderGenerator(HeaderGenerator headerGenerator) {
         this.headerGenerator = headerGenerator;
+		this.headers.putAll(headerGenerator.generateHeaders());
     }
 
     public Map<String, String> getHeaders() {
-        Map<String, String> newHeaders = new HashMap<>();
-        newHeaders.putAll(headers);
-        if(headerGenerator != null){
-            newHeaders.putAll(headerGenerator.generateHeaders());
-        }
-        return newHeaders;
+        return headers;
     }
 
     public String getMethod() {
@@ -126,6 +122,10 @@ public class SurfHttpRequest {
         headers.put(key, value);
     }
 
+    public void addHeaderAll(Map<String, String> headers){
+    	headers.putAll(headers);
+	}
+
     public void addParams(String name, String value){
         params.put(name, value);
     }
@@ -134,7 +134,7 @@ public class SurfHttpRequest {
         bodyParams.put(name, value);
     }
 
-    public void setHeaders(Map<String, String> headers) {
+    /*public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
-    }
+    }*/
 }

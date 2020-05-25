@@ -12,6 +12,7 @@ import com.yilnz.surfing.core.plugin.PaginationClz;
 import com.yilnz.surfing.core.plugin.ReLogin;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
+import com.yilnz.surfing.core.site.Site;
 import com.yilnz.surfing.core.tool.Tool;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -124,14 +125,6 @@ public class SurfSpider {
 		downloader.downloadFiles(basePath);
 	}
 
-	public static File downloadIfNotExist(String filePath, String url) {
-		return downloadIfNotExist(filePath, url, null);
-	}
-
-	public static File getPage(String filePath, String url) {
-		return getPage(filePath, url, null);
-	}
-
 	/**
 	 * 阻塞型请求 - 在文件不存在的时候下载  例子. downloadIfNotExist("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 *
@@ -139,12 +132,12 @@ public class SurfSpider {
 	 * @param url      请求地址
 	 * @return
 	 */
-	public static File downloadIfNotExist(String filePath, String url, Site site) {
+	public static File downloadIfNotExist(String filePath, String url) {
 		final File file = new File(filePath);
 		if (file.exists()) {
 			return file;
 		}
-		return getPage(filePath, url, site);
+		return getPage(filePath, url);
 	}
 
 	/**
@@ -154,9 +147,9 @@ public class SurfSpider {
 	 * @param url      请求地址
 	 * @return
 	 */
-	public static File getPage(String filePath, String url, Site site) {
+	public static File getPage(String filePath, String url) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
-		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest(site);
+		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
 		requests.add(surfHttpRequest);
 		final SurfFileDownloader downloader = new SurfFileDownloader(requests, filePath);
@@ -345,6 +338,10 @@ public class SurfSpider {
 		}
 
 		return pages;
+	}
+
+	public SpiderHttpStatus getHttpStatus(){
+		return new SpiderHttpStatus((SurfHttpDownloader) downloader);
 	}
 
 

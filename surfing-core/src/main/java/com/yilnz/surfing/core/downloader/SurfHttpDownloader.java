@@ -1,6 +1,7 @@
 package com.yilnz.surfing.core.downloader;
 
-import com.yilnz.surfing.core.Site;
+import com.yilnz.surfing.core.log.LogUploader;
+import com.yilnz.surfing.core.site.Site;
 import com.yilnz.surfing.core.SurfHttpClient;
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessorInterface;
@@ -95,6 +96,7 @@ public class SurfHttpDownloader implements Downloader {
 				return thread;
 			}
 		});
+		this.requests.forEach(e->e.addHeaderAll(site.getHeaders()));
 	}
 
 	public void stopNow(){
@@ -108,7 +110,7 @@ public class SurfHttpDownloader implements Downloader {
 		httpClient.setProxyProvider(this.proxyProvider);
 		List<Future<Page>> pages = new ArrayList<>();
 		requests.forEach(e->{
-			final Site currentSite = (site == null) ? e.getSite() : site;
+			final Site currentSite = site;
 			pages.add(threadPool.submit(new Callable<Page>() {
 				@Override
 				public Page call() {
@@ -132,16 +134,20 @@ public class SurfHttpDownloader implements Downloader {
 							} else if (page.getStatusCode() == 200) {
 								try {
 									pageProcessor.process(page);
+									site.getLogUploader().uploadLog("处理200OK", page, LogUploader.TYPE_PROCESS_OK);
 								} catch (Exception e) {
 									logger.error("[surfing]process error", e);
+									site.getLogUploader().uploadLog("200消息处理异常", page, LogUploader.TYPE_PROCESS_OK_EXCEPTION);
 								}
 								successPageCount.incrementAndGet();
 								totalPageCount.incrementAndGet();
 							} else if (currentSite.getRetryTimes() <= 0) {
 								try {
 									pageProcessor.processError(page);
+									site.getLogUploader().uploadLog("处理失败", page, LogUploader.TYPE_PROCESS_ERROR);
 								} catch (Exception e) {
 									logger.error("[surfing]processERROR error", e);
+									site.getLogUploader().uploadLog("处理失败异常", page, LogUploader.TYPE_PROCESS_ERROR_EXCEPTION);
 								}
 								errorPageCount.incrementAndGet();
 								totalPageCount.incrementAndGet();
@@ -149,6 +155,7 @@ public class SurfHttpDownloader implements Downloader {
 							}
 						}
 					}catch (Exception e){
+						site.getLogUploader().uploadLog("请求异常", page, LogUploader.TYPE_REQUEST_EXCEPTION);
 						logger.error("[surfing]request error", e);
 					}catch (Error e){
 						logger.error("[surfing]request fatal error", e);
@@ -186,7 +193,7 @@ public class SurfHttpDownloader implements Downloader {
 			}
 			final List<SurfHttpRequest> retryList = new ArrayList<>();
 			retryList.add(request);
-			Site site = this.site == null ? request.getSite() : this.site;
+			Site site = this.site;
 			List<Future<Page>> downloads = new SurfHttpDownloader(retryList, 1, pageProcessor, Site.me().clone(site).setRetryTimes(1), proxy, proxyProvider, null).downloads();
 			Page page1 = null;
 			try {

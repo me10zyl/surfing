@@ -1,6 +1,6 @@
 package com.yilnz.surfing.examples.advance;
 
-import com.yilnz.surfing.core.Site;
+import com.yilnz.surfing.core.site.Site;
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfPageProcessor;
 import com.yilnz.surfing.core.SurfSpider;
