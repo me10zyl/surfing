@@ -4,6 +4,7 @@ import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfHttpRequestBuilder;
 import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Page;
+import com.yilnz.surfing.core.exporter.Exporters;
 import com.yilnz.surfing.core.plugin.HandlePage;
 import com.yilnz.surfing.core.plugin.PaginationClz;
 import com.yilnz.surfing.core.selectors.Selectable;
@@ -45,9 +46,7 @@ public class TestTieba {
 					public void process(Page page, int currentPage) {
 						logger.info("当前页：" + currentPage);
 						List<Tiezi> tiezis = page.getHtml().toList(new TieziConverter(Selectors.$(".j_thread_list")));
-						for (Tiezi tiezi : tiezis) {
-							System.out.println(tiezi.getTitle() + " " + tiezi.getAuthor() + " " + tiezi.getUrl());
-						}
+						Exporters.CONSOLE.exportList(tiezis, "title", "author", "url");
 					}
 
 					@Override
