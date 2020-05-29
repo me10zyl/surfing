@@ -2,15 +2,17 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="surfing-ippool-service" />
         <module name="surfing-selenium" />
-        <module name="surfing-ippool-export" />
+        <module name="surfing-tampermonkey" />
         <module name="surfing" />
         <module name="surfing-ippool-web" />
+        <module name="surfing-ippool-export" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -20,7 +22,8 @@
       <module name="surfing-ippool-service" target="8" />
       <module name="surfing-ippool-web" target="8" />
       <module name="surfing-parent" target="1.5" />
-      <module name="surfing-selenium" target="1.5" />
+      <module name="surfing-selenium" target="8" />
+      <module name="surfing-tampermonkey" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

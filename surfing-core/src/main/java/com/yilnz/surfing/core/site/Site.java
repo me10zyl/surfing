@@ -19,10 +19,12 @@ public class Site {
 	}
 
 	private Site(){
-		this.sleepTime = GlobalSite.SITE.sleepTime;
-		this.retryTimes = GlobalSite.SITE.retryTimes;
-		this.headers = GlobalSite.SITE.headers;
-		this.logUploader = GlobalSite.SITE.logUploader;
+		if(GlobalSite.SITE != null) {
+			this.sleepTime = GlobalSite.SITE.sleepTime;
+			this.retryTimes = GlobalSite.SITE.retryTimes;
+			this.headers = GlobalSite.SITE.headers;
+			this.logUploader = GlobalSite.SITE.logUploader;
+		}
 	}
 
 	public static Site me(){

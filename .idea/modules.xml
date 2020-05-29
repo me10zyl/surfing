@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/surfing-ippool/surfing-ippool-web/surfing-ippool-web.iml" filepath="$PROJECT_DIR$/surfing-ippool/surfing-ippool-web/surfing-ippool-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/surfing-parent.iml" filepath="$PROJECT_DIR$/surfing-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/surfing-selenium/surfing-selenium.iml" filepath="$PROJECT_DIR$/surfing-selenium/surfing-selenium.iml" />
+      <module fileurl="file://$PROJECT_DIR$/surfing-tampermonkey/surfing-tampermonkey.iml" filepath="$PROJECT_DIR$/surfing-tampermonkey/surfing-tampermonkey.iml" />
     </modules>
   </component>
 </project>
