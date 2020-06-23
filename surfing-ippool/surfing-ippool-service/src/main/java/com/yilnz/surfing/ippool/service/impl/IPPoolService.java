@@ -1,8 +1,7 @@
 package com.yilnz.surfing.ippool.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfSprider;
+import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.header.generators.ChromeHeaderGenerator;
 import com.yilnz.surfing.core.proxy.HttpProxy;
@@ -18,7 +17,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
@@ -252,7 +250,7 @@ public class IPPoolService {
         request.setMethod("GET");
         request.setHeaderGenerator(new ChromeHeaderGenerator());
         request.setConnectTimeout(10000);
-        final Page page = SurfSprider.create().addRequest(request).setProxy(httpProxy).request();
+        final Page page = SurfSpider.create().addRequest(request).setProxy(httpProxy).request().get(0);
         if (page.getStatusCode() == 200) {
             return true;
         }
