@@ -141,6 +141,16 @@ public class SurfSpider {
 	}
 
 	/**
+	 * 下载并覆盖
+	 * @param filePath
+	 * @param url
+	 * @return
+	 */
+	public static File downloadReplaced(String filePath, String url){
+		return getPage(filePath, url);
+	}
+
+	/**
 	 * 阻塞型请求 - 下载文件 例子. getPage("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 *
 	 * @param filePath 文件下载路径

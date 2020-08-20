@@ -11,12 +11,9 @@
     <modules>
         <module>surfing-ippool</module>
         <module>surfing-core</module>
-		<module>surfing-selenium</module>
+        <module>surfing-selenium</module>
         <module>surfing-tampermonkey</module>
     </modules>
 
-
-
     <description>An Easy WebSpider</description>
-
 </project>
