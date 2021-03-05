@@ -2,6 +2,8 @@ package com.yilnz.surfing.test.seletorsTest;
 
 import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Page;
+import com.yilnz.surfing.core.selectors.Selectable;
+import lombok.Data;
 import org.junit.Assert;
 import org.junit.Test;
 import sun.security.krb5.internal.crypto.Des;
@@ -12,16 +14,18 @@ import java.util.List;
 
 public class JsonSelectorTest {
 
+    @Data
     class ClassRoom {
         List<Student> studentList = new ArrayList<>();
         List<Desk> deskList = new ArrayList<>();
     }
 
+    @Data
     class Desk{
         private BigDecimal price;
         private String color;
     }
-
+    @Data
     class Student {
         private String name;
         private int age;
@@ -55,5 +59,8 @@ public class JsonSelectorTest {
         Assert.assertEquals(page.getHtml().selectJson("headers.Host").get(), "httpbin.org");
         Assert.assertNotNull(page.getHtml().selectJson("notExistResponse"));
         Assert.assertNull(page.getHtml().selectJson("notExistResponse").get());
+        List<Selectable> nodes = page.getHtml().selectJson("$.json.deskList").nodes();
+        Assert.assertEquals(nodes.stream().filter(e->e.selectJson("color").get().equals("yellow")).findFirst().get().selectJson("price").get(),"12");
+        Assert.assertEquals(page.getHtml().selectJson("$.json.deskList[price=12]").selectJson("color").get(), "yellow");
     }
 }
