@@ -7,7 +7,7 @@ import com.yilnz.surfing.core.selectors.Selectors;
 
 public class AndOrTest {
 	public static void main(String[] args) {
-		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
+		/*final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setMethod("get");
 		surfHttpRequest.setUrl("http://www.baidu.com");
 		final Page page = SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
@@ -15,6 +15,6 @@ public class AndOrTest {
 				.or(Selectors.$("img", "src"))
 				.and(Selectors.regex("^//.+"))).nodes().forEach(e->{
 			System.out.println(e.get());
-		});
+		});*/
 	}
 }

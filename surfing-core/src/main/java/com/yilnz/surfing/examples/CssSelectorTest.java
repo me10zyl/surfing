@@ -14,7 +14,7 @@ public class CssSelectorTest {
         request.setUrl("http://www.baidu.com");
         request.setMethod("GET");
         final Page page = SurfSpider.create().addRequest(request).request().get(0);
-        final Selectable select = page.getHtml().select(Selectors.$("a", true));
+        final Selectable select = page.getHtml().select(Selectors.$("a"));
         final List<Selectable> nodes = select.nodes();
         nodes.forEach(e->{
             System.out.println(e);

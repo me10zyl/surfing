@@ -12,7 +12,7 @@
 
     <groupId>com.yilnz</groupId>
     <artifactId>surfing-ippool-parent</artifactId>
-    <version>0.1.10</version>
+    <version>0.1.12</version>
 
     <packaging>pom</packaging>
 
@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>com.yilnz</groupId>
                 <artifactId>surfing</artifactId>
-                <version>0.1.10</version>
+                <version>0.1.12</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>

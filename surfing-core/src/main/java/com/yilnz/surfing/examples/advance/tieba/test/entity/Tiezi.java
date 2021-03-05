@@ -1,4 +1,4 @@
-package com.yilnz.surfing.test.entity;
+package com.yilnz.surfing.examples.advance.tieba.test.entity;
 
 public class Tiezi {
 	private String title;

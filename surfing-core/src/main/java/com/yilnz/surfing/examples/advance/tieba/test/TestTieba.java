@@ -1,4 +1,4 @@
-package com.yilnz.surfing.test;
+package com.yilnz.surfing.examples.advance.tieba.test;
 
 import com.yilnz.surfing.core.SurfHttpRequest;
 import com.yilnz.surfing.core.SurfHttpRequestBuilder;
@@ -9,9 +9,8 @@ import com.yilnz.surfing.core.plugin.HandlePage;
 import com.yilnz.surfing.core.plugin.PaginationClz;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selectors;
-import com.yilnz.surfing.test.converter.TieziConverter;
-import com.yilnz.surfing.test.entity.Tiezi;
-import org.junit.Test;
+import com.yilnz.surfing.examples.advance.tieba.test.converter.TieziConverter;
+import com.yilnz.surfing.examples.advance.tieba.test.entity.Tiezi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +19,8 @@ import java.util.List;
 
 public class TestTieba {
 	private static final Logger logger = LoggerFactory.getLogger(TestTieba.class);
-	@Test
-	public void test1() {
+
+	public void testTieba() {
 		SurfSpider.startPagination(new PaginationClz() {
 			@Override
 			public int getPageCount() {
@@ -32,6 +31,7 @@ public class TestTieba {
 				final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
 				Selectable select = lastpagea.select(Selectors.regex("pn=(\\d+)", 1));
 				return select.getInt() / 50;
+				//return 3;
 			}
 
 			@Override

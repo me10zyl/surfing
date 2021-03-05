@@ -19,7 +19,7 @@ public class TiebaTestWithThreadsSimple {
 		request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
 		request1.setMethod("get");
 		request1.setData(1);
-		SurfSpider.create(new PaginationTool("http://tieba.baidu.com/f?kw=java&fr=index&pn=",
+		/*SurfSpider.create(new PaginationTool("http://tieba.baidu.com/f?kw=java&fr=index&pn=",
 				Selectors.$("a.pagination-item:last-of-type", "href")
 						.and(Selectors.regex("(?>pn=)(.+)", 1)), 5, 50)).setSite(Site.me().setRetryTimes(2).setSleepTime(500)).setProcessor(new SurfPageProcessor() {
 
@@ -35,6 +35,6 @@ public class TiebaTestWithThreadsSimple {
 			public void processError(Page page) {
 				System.err.println("error page -> " +page.getData());
 			}
-		}).addRequest(request1).start();
+		}).addRequest(request1).start();*/
 	}
 }

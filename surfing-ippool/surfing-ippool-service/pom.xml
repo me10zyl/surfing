@@ -19,7 +19,7 @@
     <parent>
         <artifactId>surfing-ippool-parent</artifactId>
         <groupId>com.yilnz</groupId>
-        <version>0.1.10</version>
+        <version>0.1.12</version>
     </parent>
 
     <groupId>com.yilnz</groupId>
