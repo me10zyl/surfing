@@ -10,10 +10,6 @@ public class ReplaceSelector extends Selector {
 		this.replacement = replacement;
 	}
 
-	@Override
-	public String select(String text) {
-		return this.selectList(text).get(0);
-	}
 
 	@Override
 	public List<String> selectList(String text) {

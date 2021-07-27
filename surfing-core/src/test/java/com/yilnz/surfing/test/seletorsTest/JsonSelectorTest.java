@@ -1,12 +1,12 @@
 package com.yilnz.surfing.test.seletorsTest;
 
 import com.yilnz.surfing.core.SurfSpider;
+import com.yilnz.surfing.core.basic.Json;
 import com.yilnz.surfing.core.basic.Page;
 import com.yilnz.surfing.core.selectors.Selectable;
 import lombok.Data;
 import org.junit.Assert;
 import org.junit.Test;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -56,6 +56,13 @@ public class JsonSelectorTest {
     public void testJson(){
         Page page = SurfSpider.postJSON("https://httpbin.org/anything", mockClassRoom());
         System.out.println(page.getHtml());
+        Json x = page.getHtml().selectJson("$.arr[0]");
+        Assert.assertNotNull(x);
+        Assert.assertNull(x.get());
+        Assert.assertNull(page.getHtml().selectJson("g").get());
+        Assert.assertNull(page.getHtml().selectJson("g").selectJson("f").get());
+        Assert.assertEquals(page.getHtml().selectJson("$.arr").nodes().size(),0);
+        Assert.assertNull(page.getHtml().selectJson("$.arr").get());
         Assert.assertEquals(page.getHtml().selectJson("headers.Host").get(), "httpbin.org");
         Assert.assertNotNull(page.getHtml().selectJson("notExistResponse"));
         Assert.assertNull(page.getHtml().selectJson("notExistResponse").get());

@@ -13,12 +13,6 @@ public class JsonSelector extends Selector{
     }
 
     @Override
-    public String select(String text) {
-        String res = (String) JSONPath.read(text, selectPattern);
-        return res;
-    }
-
-    @Override
     public List<String> selectList(String text) {
         final Object read = JSONPath.read(text, selectPattern);
         if (read == null) {

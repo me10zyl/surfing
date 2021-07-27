@@ -58,7 +58,7 @@ public class FreeProxyCZIPPoolProvider extends StandardIPPoolProvider {
         customRequest.setUrl(pagedURL);
         List<HttpProxy> httpProxies =  IPPool.extractProxyListFromURL(customRequest, getProxyProvider(), "#proxy_list", 0, 1,-1, new IPPool.TrHandler() {
             @Override
-            public HttpProxy handleTr(Selectable tr, List<Selectable> tds) {
+            public HttpProxy handleTr(Selectable tr, List<? extends Selectable> tds) {
                 if(tds.size() < 2){
                     return null;
                 }

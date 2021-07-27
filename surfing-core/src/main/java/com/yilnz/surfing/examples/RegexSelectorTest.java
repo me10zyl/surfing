@@ -15,7 +15,7 @@ public class RegexSelectorTest {
         request.setMethod("GET");
         final Page page = SurfSpider.create().addRequest(request).request().get(0);
         final Selectable select = page.getHtml().select(Selectors.regex("<a.+?>.+?</a>"));
-        final List<Selectable> nodes = select.nodes();
+        final List<? extends Selectable> nodes = select.nodes();
         nodes.forEach(e->{
             System.out.println(e.select(Selectors.$("a", "name")));
         });

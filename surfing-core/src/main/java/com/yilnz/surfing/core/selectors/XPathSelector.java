@@ -19,11 +19,6 @@ public class XPathSelector extends Selector {
     }
 
     @Override
-    public String select(String text) {
-        return selectList(text).get(0);
-    }
-
-    @Override
     public List<String> selectList(String text) {
 //        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 //        dbf.setValidating(false);

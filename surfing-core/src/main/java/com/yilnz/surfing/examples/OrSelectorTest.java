@@ -19,17 +19,14 @@ public class OrSelectorTest {
 		final Page page = SurfSpider.create().addRequest(request).request().get(0);
 		final Selectable select = page.getHtml().select(Selectors.$("a", true));
 		Selectable select1 = page.getHtml().select(Selectors.regex("<img.+?>"));
-		List<Selectable> nodes = select.nodes();
-		nodes.addAll(select1.nodes());
+		List<? extends Selectable> nodes = select.nodes();
+		List<? extends Selectable> nodes2 = select1.nodes();
 		for (Selectable node : nodes) {
 			System.out.println(node.get());
 		}
-//		String collect = select.nodes().stream().map(e -> e.get()).collect(Collectors.joining("\n"));
-		/*Document parse = Jsoup.parse(collect);
-		System.out.println(parse.select("a:nth-last-child(2)"));*/
-		/*select.nodes().forEach(e->{
-			System.out.println(e);
-		});*/
+		for (Selectable node : nodes2) {
+			System.out.println(node.get());
+		}
 	}
 
 }

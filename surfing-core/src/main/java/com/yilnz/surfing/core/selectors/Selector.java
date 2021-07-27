@@ -16,8 +16,6 @@ public abstract class Selector {
         this.selectPattern = selectPattern;
     }
 
-    public abstract String select(String text);
-
     public abstract List<String> selectList(String text);
 
     public List<Selector> getOtherSelectors() {

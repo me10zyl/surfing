@@ -12,10 +12,13 @@ public interface Selectable {
 
     Selectable select(Selector selector);
 
-    List<Selectable> nodes();
+    List<? extends Selectable> nodes();
 
     Integer getInt();
 
+    Long getLong();
+
+    Boolean getBoolean();
 
 	Json selectJson(String jsonPath);
 
@@ -23,5 +26,5 @@ public interface Selectable {
 
 	HtmlNode selectXPath(String xpath);
 
-	Selectable filter(Filter... filters);
+    public abstract Selectable filter(Filter... filters);
 }

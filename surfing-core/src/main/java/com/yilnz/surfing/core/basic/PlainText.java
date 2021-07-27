@@ -25,30 +25,36 @@ public class PlainText extends AbstractSelectable {
 
     @Override
     public String get() {
-        if (this.text == null) {
-            return null;
-        }
-        if (this.text.size() == 1) {
-            return text.get(0);
-        }
         if (this.text.size() == 0) {
             return null;
         }
-        return text.toString();
+        return text.get(0);
     }
 
     @Override
     public Selectable select(Selector selector) {
+        //page.getHtml().selectJson("g").selectJson("f").get() situation
+        if(this.text.size() == 0){
+            if(selector instanceof JsonSelector){
+                return new Json(new ArrayList<>());
+            }
+            if(selector instanceof CssSelector){
+                return new HtmlNode(new ArrayList<>());
+            }
+            return new PlainText(new ArrayList<>());
+        }
+
         final List<String> selectList = selector.selectList(this.text.get(0));
         if (selectList == null) {
             if(selector instanceof JsonSelector){
-                return new Json(selectList);
+                return new Json(new ArrayList<>());
             }
             if(selector instanceof CssSelector){
-                return new HtmlNode(selectList);
+                return new HtmlNode(new ArrayList<>());
             }
-            return new PlainText(selectList);
+            return new PlainText(new ArrayList<>());
         }
+
         final List<Selector> otherSelectors = selector.getOtherSelectors();
         otherSelectors.forEach(otherSelector -> {
                     if ("AND".equals(otherSelector.getLogicType())) {
@@ -69,25 +75,13 @@ public class PlainText extends AbstractSelectable {
             return new Json(selectList);
         }
         if(selector instanceof CssSelector){
-        	return new HtmlNode(selectList);
+        	return new HtmlNode(selectList, (CssSelector) selector);
 		}
         return new PlainText(selectList);
     }
 
-    public Json selectJson(String jsonPath){
-		return (Json) this.select(Selectors.jsonPath(jsonPath));
-	}
-
-	public HtmlNode selectCss(String cssQuery){
-    	return (HtmlNode) this.select(Selectors.$(cssQuery));
-	}
-
-	public HtmlNode selectXPath(String xpath){
-    	return (HtmlNode) this.select(Selectors.xpath(xpath));
-	}
-
     @Override
-    public List<Selectable> nodes() {
+    public List<? extends Selectable> nodes() {
         List<Selectable> plainTexts = new ArrayList<>();
         for (String text : this.text) {
             plainTexts.add(new PlainText(text));
@@ -95,6 +89,7 @@ public class PlainText extends AbstractSelectable {
         return plainTexts;
     }
 
+    @Override
     public Selectable filter(Filter... filters){
 
 		for (Filter filter : filters) {

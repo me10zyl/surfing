@@ -18,21 +18,6 @@ public class RegexSelector extends Selector {
     }
 
     @Override
-    public String select(String text) {
-        Pattern pattern = Pattern.compile(this.selectPattern);
-        Matcher matcher = pattern.matcher(text);
-        String group = null;
-        while (matcher.find()) {
-            if(this.group != null){
-                group = matcher.group(this.group);
-            }else{
-                group = matcher.group();
-            }
-        }
-        return group;
-    }
-
-    @Override
     public List<String> selectList(String text) {
         Pattern pattern = Pattern.compile(this.selectPattern);
         Matcher matcher = pattern.matcher(text);

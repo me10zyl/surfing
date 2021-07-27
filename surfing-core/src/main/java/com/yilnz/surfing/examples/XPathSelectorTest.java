@@ -15,7 +15,7 @@ public class XPathSelectorTest {
         request.setMethod("Get");
         final Page page = SurfSpider.create().addRequest(request).request().get(0);
         final Selectable select = page.getHtml().select(Selectors.xpath("//a/text()"));
-        final List<Selectable> nodes = select.nodes();
+        final List<? extends Selectable> nodes = select.nodes();
         nodes.forEach(e->{
             System.out.println(e);
         });

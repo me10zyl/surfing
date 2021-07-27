@@ -14,6 +14,14 @@ public class CssSelector extends Selector {
     private String attr;
     private boolean containsTag;
 
+    public String getAttr() {
+        return attr;
+    }
+
+    public boolean isContainsTag() {
+        return containsTag;
+    }
+
     public CssSelector(String selectPattern) {
         super(selectPattern);
     }
@@ -26,20 +34,6 @@ public class CssSelector extends Selector {
     public CssSelector(String selectPattern, boolean containsTag) {
         super(selectPattern);
         this.containsTag = containsTag;
-    }
-
-    @Override
-    public String select(String text) {
-        Element element = new Element(text);
-        final Element element1 = element.selectFirst(selectPattern);
-        if(containsTag){
-            return element1.toString();
-        }
-        if(this.attr != null) {
-            return element1.attr(this.attr);
-        }
-        return element1.html();
-
     }
 
     @Override
@@ -57,9 +51,9 @@ public class CssSelector extends Selector {
                 }
             }else{
                 String finalText = next.toString();
-                if(!containsTag){
+               /* if(!containsTag){
                     finalText = next.html();
-                }
+                }*/
                 res.add(finalText);
             }
         }

@@ -80,7 +80,7 @@ public class IPPool {
     }
 
     public interface TrHandler{
-        HttpProxy handleTr(Selectable tr, List<Selectable> tds);
+        HttpProxy handleTr(Selectable tr, List<? extends Selectable> tds);
     }
 
     public static List<HttpProxy> extractProxyListFromURL(SurfHttpRequest request, ProxyProvider proxyProvider, String tableCssSelector, int ipIndex, int portIndex, int schemaIndex, TrHandler trHandler) {
@@ -89,7 +89,7 @@ public class IPPool {
             surfSprider.setProxyProvider(proxyProvider);
         }
         final Page page = surfSprider.addRequest(request).request().get(0);
-        final List<Selectable> nodes = page.getHtml().select(Selectors.$(tableCssSelector + " tr:nth-of-type(n+2)")).nodes();
+        final List<? extends Selectable> nodes = page.getHtml().select(Selectors.$(tableCssSelector + " tr:nth-of-type(n+2)")).nodes();
         List<HttpProxy> httpHosts = new ArrayList<>();
         for (Selectable node : nodes) {
             final Selectable td = node.select(Selectors.regex("<td.*?>(.*?)</td>", 1));
