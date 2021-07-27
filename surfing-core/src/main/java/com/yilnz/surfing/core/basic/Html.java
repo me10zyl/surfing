@@ -2,7 +2,7 @@ package com.yilnz.surfing.core.basic;
 
 import java.util.List;
 
-public class Html extends HtmlNode{
+public class Html extends PlainText{
 
     private String url;
 

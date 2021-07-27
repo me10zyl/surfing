@@ -11,7 +11,7 @@
 
     <groupId>com.yilnz</groupId>
     <artifactId>surfing</artifactId>
-    <version>0.1.12</version>
+    <version>0.1.13</version>
 
     <properties>
         <repoAddr>private_maven_repo_url</repoAddr>
@@ -78,12 +78,21 @@
             <version>1.18.16</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.fansu.tagsoup</groupId>
+            <artifactId>tagsoup</artifactId>
+            <version>1.0.5</version>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.8</version>
 		</dependency>
+        <dependency>
+            <groupId>net.sf.jtidy</groupId>
+            <artifactId>jtidy</artifactId>
+            <version>r938</version>
+        </dependency>
 	</dependencies>
     <licenses>
         <license>

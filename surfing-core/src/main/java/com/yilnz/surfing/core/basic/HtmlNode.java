@@ -6,8 +6,8 @@ import com.yilnz.surfing.core.selectors.CssSelector;
 import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selector;
 import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
-import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +52,6 @@ public class HtmlNode  extends PlainText {
         }
         return plainTexts;
     }
-
 
     public String wrapTag(){
         if (this.text.size() == 0) {

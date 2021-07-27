@@ -28,9 +28,8 @@ public class CssSelectorTest {
         Assert.assertEquals(html.select(Selectors.$("[type=checkbox]","value")).get(), "bacon");
         Assert.assertEquals(html.select(Selectors.$("[type=checkbox]",true)).get(), "<input type=\"checkbox\" name=\"topping\" value=\"bacon\">");
         System.out.println(htmlNode.nodes().stream().map(HtmlNode::wrapTag).collect(Collectors.joining(",")));
-        Assert.assertEquals(" Bacon ", htmlNode.selectCss("[value=bacon]").get());
+        Assert.assertEquals("onion", htmlNode.selectCss("[value=onion]").attr("value"));
         Assert.assertEquals("bacon", htmlNode.attr("value"));
-        Assert.assertEquals("Onion",  htmlNode.selectCss("[value=onion]").get().trim());
     }
 
     @Test

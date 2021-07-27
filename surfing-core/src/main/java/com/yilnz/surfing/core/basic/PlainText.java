@@ -41,18 +41,18 @@ public class PlainText extends AbstractSelectable {
             if(selector instanceof CssSelector){
                 return new HtmlNode(new ArrayList<>());
             }
-            return new PlainText(new ArrayList<>());
-        }
-
-        final List<String> selectList = selector.selectList(this.text.get(0));
-        if (selectList == null) {
-            if(selector instanceof JsonSelector){
-                return new Json(new ArrayList<>());
-            }
-            if(selector instanceof CssSelector){
+            if(selector instanceof XPathSelector){
                 return new HtmlNode(new ArrayList<>());
             }
             return new PlainText(new ArrayList<>());
+        }
+
+        final List<String> selectList = new ArrayList<>();
+        for (String t : this.text) {
+            List<String> text = selector.selectList(t);
+            if (text != null) {
+                selectList.addAll(text);
+            }
         }
 
         final List<Selector> otherSelectors = selector.getOtherSelectors();
@@ -77,6 +77,9 @@ public class PlainText extends AbstractSelectable {
         if(selector instanceof CssSelector){
         	return new HtmlNode(selectList, (CssSelector) selector);
 		}
+        if(selector instanceof XPathSelector){
+            return new HtmlNode(selectList);
+        }
         return new PlainText(selectList);
     }
 

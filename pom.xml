@@ -7,7 +7,7 @@
     <groupId>com.yilnz</groupId>
     <artifactId>surfing-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.12</version>
+    <version>0.1.13</version>
     <modules>
         <module>surfing-ippool</module>
         <module>surfing-core</module>
