@@ -9,9 +9,6 @@ public abstract class Selectors {
     public static Selector $(String selectPattern, String attr){
         return new CssSelector(selectPattern, attr);
     }
-    public static Selector $(String selectPattern, boolean containsTag){
-        return new CssSelector(selectPattern, containsTag);
-    }
 
     public static Selector regex(String selectPattern) {
         return new RegexSelector(selectPattern);

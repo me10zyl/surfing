@@ -4,6 +4,11 @@ import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.HtmlNode;
 import org.ccil.cowan.tagsoup.Parser;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.SimpleHtmlSerializer;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.XPather;
+import org.htmlcleaner.XPatherException;
 import org.jsoup.Jsoup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,15 +22,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import us.codecraft.xsoup.Xsoup;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -34,7 +43,9 @@ import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class XPathSelectorTest {
 
@@ -42,54 +53,44 @@ public class XPathSelectorTest {
     public void test1(){
         Html html = SurfSpider.get("https://httpbin.org/forms/post").getHtml();
         System.out.println(html);
-        HtmlNode htmlNode = html.selectXPath("//*[text()='Bacon']");
-        Assert.assertEquals(htmlNode.attr("type"), "checkbox");
+        HtmlNode htmlNode = html.selectXPath("//*[text()=' Bacon ']");
+        Assert.assertEquals(htmlNode.get().trim(), "Bacon");
+        System.out.println(htmlNode.outerHtml());
+        Assert.assertEquals(htmlNode.selectXPath("//input").selectCss("input", "value").get(), "bacon");
+        //Assert.assertEquals(htmlNode.attr("type"), "checkbox");
     }
 
     @Test
-    public void testXSoup() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, TransformerException {
-        //Xsoup.compile("//*[text()=' Bacon ']");
-        /*Html html = SurfSpider.get("https://httpbin.org/forms/post").getHtml();
-        System.out.println(html);
-        Parser parser = new Parser();
-        ByteArrayInputStream source = new ByteArrayInputStream(html.toString().getBytes(StandardCharsets.UTF_8));
-       *//* DOMResult result = new DOMResult();
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.transform(new SAXSource(parser, new InputSource(source)), result);
-        Document xmlDocument = (Document) result.getNode();
-        System.out.println(xmlDocument);*//*
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //tidy.parse(new ByteArrayInputStream(html.toString().getBytes(StandardCharsets.UTF_8)), baos);
-        String s =  baos.toString();
+    public void testHtmlCleaner() throws XPatherException, ParserConfigurationException, IOException, SAXException, XPathExpressionException, TransformerException {
+        Html html = SurfSpider.get("https://httpbin.org/forms/post").getHtml();
+        //System.out.println(html);
+        HtmlCleaner cleaner = new HtmlCleaner();
+        XPather xPather = new XPather("//*[text()=' Bacon ']");
+        TagNode clean = cleaner.clean(html.get());
+        SimpleHtmlSerializer x = new SimpleHtmlSerializer(cleaner.getProperties());
+        String s = x.getAsString(clean);
         System.out.println(s);
+        Object[] myNodes = xPather.evaluateAgainstNode(clean);
+        for (Object myNode : myNodes) {
+            System.out.println(myNode);
+        }
+
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        Document xmlDocument1 = builder.parse(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
+        Document xmlDocument = builder.parse(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         XPath xPath = XPathFactory.newInstance().newXPath();
         XPathExpression compile = xPath.compile("//*[text()=' Bacon ']");
-        XPathExpression compile2 = xPath.compile("//*[@name='topping']");
-        String evaluate = compile.evaluate(xmlDocument);
-        NodeList nodeList = (NodeList) compile2.evaluate(xmlDocument, XPathConstants.NODESET);
-        System.out.println(" ?? " + evaluate);
-        for(int i = 0;i < nodeList.getLength();i++){
-            Node item = nodeList.item(i);
-            String nodeName = item.getNodeName();
-            NamedNodeMap attributes = item.getAttributes();
-            String textContent = item.getTextContent();
-            StringBuilder sb = new StringBuilder("<");
-            sb.append(nodeName).append(" ");
-            for(int j = 0;j < attributes.getLength();j++){
-                Node node = attributes.item(j);
-                String nodeValue = node.getNodeValue();
-                String nodeName1 = node.getNodeName();
-                sb.append(nodeName1).append("=").append("\"").append(nodeValue).append("\"").append(" ");
-            }
-            if(attributes.getLength() == 0){
-                sb.append(" ");
-            }
-            sb.append(">").append(textContent).append("</" + nodeName + ">");
-            System.out.println(sb);
-        }*/
+        NodeList nodesList = (NodeList) compile.evaluate(xmlDocument, XPathConstants.NODESET);
+        for(int i = 0;i < nodesList.getLength();i++){
+            StringWriter writer = new StringWriter();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform(new DOMSource(nodesList.item(i)), new StreamResult(writer));
+            String xml = writer.toString();
+            //xml = xml.substring(xml.indexOf("?>") + 2);
+            System.out.println("evaluate result:" + xml);
+        }
 
     }
+
 }

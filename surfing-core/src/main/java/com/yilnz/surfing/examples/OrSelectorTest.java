@@ -17,7 +17,7 @@ public class OrSelectorTest {
 		request.setUrl("http://www.baidu.com");
 		request.setMethod("GET");
 		final Page page = SurfSpider.create().addRequest(request).request().get(0);
-		final Selectable select = page.getHtml().select(Selectors.$("a", true));
+		final Selectable select = page.getHtml().select(Selectors.$("a"));
 		Selectable select1 = page.getHtml().select(Selectors.regex("<img.+?>"));
 		List<? extends Selectable> nodes = select.nodes();
 		List<? extends Selectable> nodes2 = select1.nodes();

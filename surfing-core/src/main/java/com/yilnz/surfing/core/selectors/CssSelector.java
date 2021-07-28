@@ -12,15 +12,10 @@ import java.util.List;
 public class CssSelector extends Selector {
 
     private String attr;
-    private boolean containsTag;
     private Elements elements;
 
     public String getAttr() {
         return attr;
-    }
-
-    public boolean isContainsTag() {
-        return containsTag;
     }
 
     public CssSelector(String selectPattern) {
@@ -30,11 +25,6 @@ public class CssSelector extends Selector {
     public CssSelector(String selectPattern, String attr) {
         super(selectPattern);
         this.attr = attr;
-    }
-
-    public CssSelector(String selectPattern, boolean containsTag) {
-        super(selectPattern);
-        this.containsTag = containsTag;
     }
 
 

@@ -3,7 +3,6 @@ package com.yilnz.surfing.test.seletorsTest;
 import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.HtmlNode;
-import com.yilnz.surfing.core.selectors.Selectable;
 import com.yilnz.surfing.core.selectors.Selectors;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +10,6 @@ import org.jsoup.select.Elements;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class CssSelectorTest {
@@ -26,10 +24,14 @@ public class CssSelectorTest {
         HtmlNode htmlNode = html.selectCss("[type=checkbox]");
         Assert.assertEquals(htmlNode.nodes().size(), 4);
         Assert.assertEquals(html.select(Selectors.$("[type=checkbox]","value")).get(), "bacon");
-        Assert.assertEquals(html.select(Selectors.$("[type=checkbox]",true)).get(), "<input type=\"checkbox\" name=\"topping\" value=\"bacon\">");
-        System.out.println(htmlNode.nodes().stream().map(HtmlNode::wrapTag).collect(Collectors.joining(",")));
-        Assert.assertEquals("onion", htmlNode.selectCss("[value=onion]").attr("value"));
-        Assert.assertEquals("bacon", htmlNode.attr("value"));
+        Assert.assertEquals(((HtmlNode)html.select(Selectors.$("[type=checkbox]"))).outerHtml(), "<input type=\"checkbox\" name=\"topping\" value=\"bacon\">");
+        System.out.println(htmlNode.nodes().stream().map(HtmlNode::outerHtml).collect(Collectors.joining(",")));
+        htmlNode.selectCss("[value]").nodes().forEach(n->{
+            System.out.println("inputs:" + n.outerHtml());
+        });
+        html.selectCss("label").nodes().forEach(n->{
+            System.out.println("label value: " +n);
+        });
     }
 
     @Test

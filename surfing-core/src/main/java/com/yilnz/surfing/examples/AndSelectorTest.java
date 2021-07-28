@@ -12,7 +12,7 @@ public class AndSelectorTest {
 		request.setUrl("http://www.baidu.com");
 		request.setMethod("GET");
 		final Page page = SurfSpider.create().addRequest(request).request().get(0);
-		Selectable step1 = page.getHtml().select(Selectors.$("a", true));
+		Selectable step1 = page.getHtml().select(Selectors.$("a"));
 		System.out.println("step1:" + step1);
 		final Selectable select = step1.select(Selectors.xpath("//*[@name=tj_trhao123]/text()"));
 		System.out.println(select);

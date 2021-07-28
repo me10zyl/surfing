@@ -36,6 +36,10 @@ public abstract class AbstractSelectable implements Selectable {
         return (HtmlNode) this.select(Selectors.$(cssQuery));
     }
 
+    public HtmlNode selectCss(String cssQuery, String attrName){
+        return (HtmlNode) this.select(Selectors.$(cssQuery, attrName));
+    }
+
     @Override
     public HtmlNode selectXPath(String xpath){
         return (HtmlNode) this.select(Selectors.xpath(xpath));

@@ -75,7 +75,7 @@ public class PlainText extends AbstractSelectable {
             return new Json(selectList);
         }
         if(selector instanceof CssSelector){
-        	return new HtmlNode(selectList, (CssSelector) selector);
+        	return new HtmlNode(selectList);
 		}
         if(selector instanceof XPathSelector){
             return new HtmlNode(selectList);

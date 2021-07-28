@@ -93,6 +93,11 @@
             <artifactId>jtidy</artifactId>
             <version>r938</version>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.htmlcleaner</groupId>
+            <artifactId>htmlcleaner</artifactId>
+            <version>2.24</version>
+        </dependency>
 	</dependencies>
     <licenses>
         <license>
