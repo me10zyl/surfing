@@ -111,18 +111,18 @@ public class SurfSpider {
 	 * @param basePath              文件下载目录
 	 * @param threadnum             最大线程数
 	 * @param fileDownloadProcessor 文件下载完成回调
-	 * @param fileNameRegex         文件下载正则，匹配URL，如 [^/]+?(?=/$|$|\?)
 	 * @param urls                  多个请求地址
 	 */
-	public static void getPage(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex, String... urls) {
+	public static List<Future<DownloadFile>> downloadBatch(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String... urls) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
 		for (int i = 0; i < urls.length; i++) {
 			final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 			surfHttpRequest.setUrl(urls[i]);
 			requests.add(surfHttpRequest);
 		}
-		final SurfFileDownloader downloader = new SurfFileDownloader(requests, threadnum, fileDownloadProcessor, fileNameRegex);
-		downloader.downloadFiles(basePath);
+		final SurfFileDownloader downloader = new SurfFileDownloader(requests, threadnum, fileDownloadProcessor);
+		List<Future<DownloadFile>> futures = downloader.downloadFiles(basePath);
+		return futures;
 	}
 
 	/**
@@ -137,17 +137,7 @@ public class SurfSpider {
 		if (file.exists()) {
 			return file;
 		}
-		return getPage(filePath, url);
-	}
-
-	/**
-	 * 下载并覆盖
-	 * @param filePath
-	 * @param url
-	 * @return
-	 */
-	public static File downloadReplaced(String filePath, String url){
-		return getPage(filePath, url);
+		return download(filePath, url);
 	}
 
 	/**
@@ -157,22 +147,36 @@ public class SurfSpider {
 	 * @param url      请求地址
 	 * @return
 	 */
-	public static File getPage(String filePath, String url) {
-		List<SurfHttpRequest> requests = new ArrayList<>();
+	public static File download(String filePath, String url) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
 		surfHttpRequest.setUrl(url);
-		requests.add(surfHttpRequest);
-		final SurfFileDownloader downloader = new SurfFileDownloader(requests, filePath);
+		return download(filePath, surfHttpRequest);
+	}
+
+
+	/**
+	 * 下载
+	 *
+	 * @param filePath 文件路径
+	 * @param request  请求
+	 * @return {@link File}
+	 */
+	public static File download(String filePath, SurfHttpRequest request) {
+		List<SurfHttpRequest> requests = new ArrayList<>();
+		requests.add(request);
+		Path path = Paths.get(filePath);
+		Path fileName = path.getFileName();
+		final SurfFileDownloader downloader = new SurfFileDownloader(requests, fileName.toString());
 		DownloadFile downloadFile = null;
 		try {
-			downloadFile = downloader.downloadFiles(filePath).get(0).get();
+			downloadFile = downloader.downloadFiles(path.getParent().toString()).get(0).get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
 		if (downloadFile == null) {
 			return null;
 		}
-		return new File(downloadFile.getFilename());
+		return new File(downloadFile.getFilepath());
 	}
 
 
@@ -191,6 +195,12 @@ public class SurfSpider {
 		return SurfSpider.create().addRequest(surfHttpRequest).request().get(0);
 	}
 
+	/**
+	 * 阻塞型请求 - postJSON
+	 * @param url
+	 * @param jsonObject
+	 * @return
+	 */
 	public static Page postJSON(String url, Object jsonObject) {
 		final SurfHttpRequest post = new SurfHttpRequestBuilder(url, "POST").json(jsonObject).build();
 		return SurfSpider.create().addRequest(post).request().get(0);
@@ -242,7 +252,7 @@ public class SurfSpider {
 	}
 
 
-	private Page getPage(Downloader downloader) {
+	private Page downloadPage(Downloader downloader) {
 		final List<Future<Page>> downloads = downloader.downloads();
 		Page page = null;
 		try {
@@ -264,7 +274,7 @@ public class SurfSpider {
 		}
 		Downloader downloader = new SurfHttpDownloader(requests, threadnum, null, Site.me(), this.proxy, this.proxyProvider, this.reLogin);
 
-		return getPage(downloader);
+		return downloadPage(downloader);
 	}
 
 	/**

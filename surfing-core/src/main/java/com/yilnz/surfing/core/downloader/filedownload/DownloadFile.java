@@ -2,7 +2,7 @@ package com.yilnz.surfing.core.downloader.filedownload;
 
 public class DownloadFile {
 	private String url;
-	private String filename;
+	private String filepath;
 
 	public String getUrl() {
 		return url;
@@ -12,11 +12,11 @@ public class DownloadFile {
 		this.url = url;
 	}
 
-	public String getFilename() {
-		return filename;
+	public String getFilepath() {
+		return filepath;
 	}
 
-	public void setFilename(String filename) {
-		this.filename = filename;
+	public void setFilepath(String filepath) {
+		this.filepath = filepath;
 	}
 }

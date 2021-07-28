@@ -31,19 +31,17 @@ public class SurfFileDownloader implements Downloader {
 	private int threadNum;
 	private ExecutorService threadPool;
 	private Logger logger = LoggerFactory.getLogger(SurfHttpDownloader.class);
-	private String fileNameRegex;
 
 
 	private List<SurfHttpRequest> requests;
 
-	public SurfFileDownloader(List<SurfHttpRequest> requests, int threadnum, FileDownloadProcessor fileDownloadProcessor, String fileNameRegex) {
+	public SurfFileDownloader(List<SurfHttpRequest> requests, int threadnum, FileDownloadProcessor fileDownloadProcessor) {
 		this.requests = requests;
 		this.fileDownloadProcessor = fileDownloadProcessor;
 		if(threadNum <= 1){
 			this.threadNum = 1;
 		}
 		this.threadNum = threadnum;
-		this.fileNameRegex = fileNameRegex;
 		initComponents();
 	}
 
@@ -52,10 +50,6 @@ public class SurfFileDownloader implements Downloader {
 		this.threadNum = 1;
 		this.fileName = fileName;
 		initComponents();
-	}
-
-	public SurfFileDownloader(List<SurfHttpRequest> requests, int threadnum, FileDownloadProcessor fileDownloadProcessor) {
-		this(requests, threadnum, fileDownloadProcessor, null);
 	}
 
 	private void initComponents(){
@@ -102,17 +96,15 @@ public class SurfFileDownloader implements Downloader {
 					for (Map.Entry<String, String> entry : headers.entrySet()) {
 						urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
 					}
-					int statusCode = urlConnection.getResponseCode();
 					in = urlConnection.getInputStream();
-
 					if(fileName == null) {
-						if (fileNameRegex != null) {
-							filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl(), fileNameRegex);
-						} else {
-							filepath = finalBasePath + FileUtil.getFileNameByUrl(e.getUrl());
-						}
+						filepath = Paths.get(finalBasePath ,FileUtil.getFileNameByUrl(e.getUrl())).toString();
 					}else{
-						filepath = fileName;
+						filepath = Paths.get(finalBasePath,fileName).toString();
+					}
+					if(fileDownloadProcessor != null) {
+						String newName = fileDownloadProcessor.getFileName(e.getUrl(), urlConnection.getHeaderFields());
+						filepath = newName == null ? filepath : (Paths.get(finalBasePath,newName).toString());
 					}
 					Files.copy(in, Paths.get(filepath), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e1) {
@@ -134,7 +126,7 @@ public class SurfFileDownloader implements Downloader {
 				}
 				final DownloadFile downloadFile = new DownloadFile();
 				downloadFile.setUrl(e.getFullUrl());
-				downloadFile.setFilename(filepath);
+				downloadFile.setFilepath(filepath);
 				if (fileDownloadProcessor != null) {
 					fileDownloadProcessor.downloadFinished(downloadFile);
 				}
