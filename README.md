@@ -280,15 +280,6 @@ HttpProxy[] proxies = new HttpProxy[]{new HttpProxy("http://127.0.0.1:7777"), ne
             }
         }).start();
 ```
-# 安装
-maven pom引用
-```xml
-<dependency>
-    <groupId>com.yilnz</groupId>
-    <artifactId>surfing</artifactId>
-    <version>LATEST</version>
-</dependency>
-```
 
 # Refer
 + [https://github.com/code4craft/webmagic](https://github.com/code4craft/webmagic)
