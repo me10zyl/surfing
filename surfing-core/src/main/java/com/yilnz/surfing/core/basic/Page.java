@@ -70,7 +70,7 @@ public class Page {
 		if(headers == null || headers.size() == 0){
 			return null;
 		}
-		return headers.get(0).toString();
+		return headers.get(0).getValue();
     }
 
 	public List<Header> getHeaders(String key){

@@ -3,37 +3,25 @@ package com.yilnz.surfing.test.seletorsTest;
 import com.yilnz.surfing.core.SurfSpider;
 import com.yilnz.surfing.core.basic.Html;
 import com.yilnz.surfing.core.basic.HtmlNode;
-import org.ccil.cowan.tagsoup.Parser;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.SimpleHtmlSerializer;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPather;
 import org.htmlcleaner.XPatherException;
-import org.jsoup.Jsoup;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-import org.w3c.tidy.ant.JTidyTask;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import us.codecraft.xsoup.Xsoup;
 
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -41,11 +29,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class XPathSelectorTest {
 
@@ -57,7 +43,6 @@ public class XPathSelectorTest {
         Assert.assertEquals(htmlNode.get().trim(), "Bacon");
         System.out.println(htmlNode.outerHtml());
         Assert.assertEquals(htmlNode.selectXPath("//input").selectCss("input", "value").get(), "bacon");
-        //Assert.assertEquals(htmlNode.attr("type"), "checkbox");
     }
 
     @Test
