@@ -1,13 +1,6 @@
 package com.yilnz.surfing.examples.advance;
 
-import com.yilnz.surfing.core.site.Site;
 import com.yilnz.surfing.core.SurfHttpRequest;
-import com.yilnz.surfing.core.SurfPageProcessor;
-import com.yilnz.surfing.core.SurfSpider;
-import com.yilnz.surfing.core.basic.Html;
-import com.yilnz.surfing.core.basic.Page;
-import com.yilnz.surfing.core.selectors.Selectors;
-import com.yilnz.surfing.core.tool.PaginationTool;
 
 public class TiebaTestWithThreadsSimple {
 	/**

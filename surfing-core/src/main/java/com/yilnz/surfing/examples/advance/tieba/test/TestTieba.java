@@ -20,6 +20,10 @@ import java.util.List;
 public class TestTieba {
 	private static final Logger logger = LoggerFactory.getLogger(TestTieba.class);
 
+	public static void main(String[] args) {
+		new TestTieba().testTieba();
+	}
+
 	public void testTieba() {
 		SurfSpider.startPagination(new PaginationClz() {
 			@Override
@@ -31,7 +35,6 @@ public class TestTieba {
 				final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
 				Selectable select = lastpagea.select(Selectors.regex("pn=(\\d+)", 1));
 				return select.getInt() / 50;
-				//return 3;
 			}
 
 			@Override

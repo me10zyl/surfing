@@ -2,6 +2,17 @@
 
 简单易用的爬虫框架，支持 CSS、Regex、XPath、JSONPath 提取文本，也可以发起同步、异步类型的HTTP请求，也支持多线程并发爬取网页。
 
+# 使用
+
+maven pom.xml:
+```xml
+<dependency>
+   <groupId>com.yilnz</groupId>
+   <artifactId>surfing</artifactId>
+   <version>LASTEST</version>
+</dependency>
+```
+
 *新增功能*
 
 + 文件批量下载
@@ -89,31 +100,51 @@ page.getHtml().select(Selectors.$("a", "href")
 一次爬5页百度贴吧，并打印帖子主题。
 
 ```java
+SurfSpider.startPagination(new PaginationClz() {
+@Override
+public int getPageCount() {
 final SurfHttpRequest request1 = new SurfHttpRequest();
-request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
-request1.setMethod("get");
-request1.setData(1);
-SurfSprider.create(new PaginationTool("http://tieba.baidu.com/f?kw=java&fr=index&pn=",
-        Selectors.$("a.pagination-item:last-of-type", "href")
-                .and(Selectors.regex("(?>pn=)(.+)", 1)), 5, 50)).setProcessor(new SurfPageProcessor() {
-    @Override
-    public Site getSite() {
-        return Site.me().setRetryTimes(2).setSleepTime(500);
-    }
+        request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
+        request1.setMethod("get");
+final Page request = SurfSpider.create().addRequest(request1).request().get(0);
+final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
+        Selectable select = lastpagea.select(Selectors.regex("pn=(\\d+)", 1));
+        return select.getInt() / 50;
+        }
 
-    @Override
-    public void process(Page page) {
-        final Html html = page.getHtml();
-        html.select(Selectors.$("a.j_th_tit")).nodes().forEach(e->{
-            System.out.println("第" + ((int)page.getData() / 50 > 0 ? (int)page.getData() / 50 : 1) + "页->" + e.get());
+@Override
+public SurfHttpRequest getPageUrl(int page) {
+        return SurfHttpRequestBuilder.create("https://tieba.baidu.com/f?kw=java&amp;ie=utf-8&pn=" + page * 50, "GET").build();
+        }
+
+@Override
+public HandlePage handlePage() {
+        return new HandlePage() {
+@Override
+public void process(Page page, int currentPage) {
+        logger.info("当前页：" + currentPage);
+        List<Tiezi> tiezis = page.getHtml().toList(new TieziConverter(Selectors.$(".j_thread_list")));
+        Exporters.CONSOLE.exportList(tiezis, "title", "author", "url");
+        }
+
+@Override
+public void processError(Page page, int currentPage) {
+
+        }
+        };
+        }
+
+@Override
+public SurfSpider surfSpider() {
+        return SurfSpider.create();
+        }
         });
-    }
+        }
 
-    @Override
-    public void processError(Page page) {
-        System.err.println("error page -> " +page.getData());
-    }
-}).addRequest(request1).start();
+        //阻塞主线程
+        for (Future<Page> future : futures) {
+        future.get();
+        }
 ```
 
 # 同步请求

@@ -13,7 +13,6 @@ import com.yilnz.surfing.core.plugin.ReLogin;
 import com.yilnz.surfing.core.proxy.HttpProxy;
 import com.yilnz.surfing.core.proxy.ProxyProvider;
 import com.yilnz.surfing.core.site.Site;
-import com.yilnz.surfing.core.tool.Tool;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ public class SurfSpider {
 	private int threadnum;
 	private static final Logger logger = LoggerFactory.getLogger(SurfSpider.class);
 	private SurfPageProcessor pageProcessor;
-	private List<Tool> tools = new ArrayList<>();
 	private HttpProxy proxy;
 	private ProxyProvider proxyProvider;
 	private Site site = Site.me();
@@ -126,11 +124,12 @@ public class SurfSpider {
 	}
 
 	/**
+	 *
 	 * 阻塞型请求 - 在文件不存在的时候下载  例子. downloadIfNotExist("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 *
 	 * @param filePath 文件下载路径
 	 * @param url      请求地址
-	 * @return
+	 * @return {@link File}
 	 */
 	public static File downloadIfNotExist(String filePath, String url) {
 		final File file = new File(filePath);
@@ -141,11 +140,12 @@ public class SurfSpider {
 	}
 
 	/**
+	 *
 	 * 阻塞型请求 - 下载文件 例子. getPage("/tmp/" + FileUtil.getFileNameByUrl(url), url)
 	 *
 	 * @param filePath 文件下载路径
 	 * @param url      请求地址
-	 * @return
+	 * @return {@link File}
 	 */
 	public static File download(String filePath, String url) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -181,11 +181,12 @@ public class SurfSpider {
 
 
 	/**
+	 *
 	 * 阻塞型请求 - POST
 	 *
 	 * @param url  请求地址
 	 * @param body 请求体
-	 * @return
+	 * @return {@link Page}
 	 */
 	public static Page post(String url, String body) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -196,28 +197,16 @@ public class SurfSpider {
 	}
 
 	/**
+	 *
 	 * 阻塞型请求 - postJSON
-	 * @param url
-	 * @param jsonObject
-	 * @return
+	 *
+	 * @param url        url
+	 * @param jsonObject json对象
+	 * @return {@link Page}
 	 */
 	public static Page postJSON(String url, Object jsonObject) {
 		final SurfHttpRequest post = new SurfHttpRequestBuilder(url, "POST").json(jsonObject).build();
 		return SurfSpider.create().addRequest(post).request().get(0);
-	}
-
-	public void setTools(List<Tool> tools) {
-		this.tools = tools;
-	}
-
-	public static SurfSpider create(Tool... tool) {
-		final SurfSpider surfSprider = new SurfSpider();
-		List<Tool> tools = new ArrayList<>();
-		for (int i = 0; i < tool.length; i++) {
-			tools.add(tool[i]);
-		}
-		surfSprider.setTools(tools);
-		return surfSprider;
 	}
 
 
@@ -266,7 +255,7 @@ public class SurfSpider {
 	/**
 	 * 重试
 	 *
-	 * @return
+	 * @return {@link Page}
 	 */
 	public Page retry() {
 		if (requests.size() == 0) {
@@ -278,9 +267,10 @@ public class SurfSpider {
 	}
 
 	/**
+	 *
 	 * 阻塞型请求 - 开始爬取
 	 *
-	 * @return
+	 * @return {@link List<Page>}
 	 */
 	public List<Page> request() {
 		final List<Future<Page>> start = start();
@@ -350,12 +340,6 @@ public class SurfSpider {
 
 		}
 		final List<Future<Page>> pages = downloader.downloads();
-
-		if (this.tools != null) {
-			this.tools.forEach(e -> {
-				e.doWork(pageProcessor, pages);
-			});
-		}
 
 		return pages;
 	}
