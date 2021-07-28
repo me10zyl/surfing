@@ -100,7 +100,7 @@ page.getHtml().select(Selectors.$("a", "href")
 遍历百度贴吧，并打印帖子主题，线程数为5。
 
 ```java
-SurfSpider.startPagination(new PaginationClz() {
+List<Future<Page>> futures = SurfSpider.startPagination(new PaginationClz() {
         @Override
         public int getPageCount() {
             final SurfHttpRequest request1 = new SurfHttpRequest();
