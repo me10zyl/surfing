@@ -100,51 +100,50 @@ page.getHtml().select(Selectors.$("a", "href")
 一次爬5页百度贴吧，并打印帖子主题。
 
 ```java
-SurfSpider.startPagination(new PaginationClz() {
-@Override
-public int getPageCount() {
-final SurfHttpRequest request1 = new SurfHttpRequest();
-        request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
-        request1.setMethod("get");
-final Page request = SurfSpider.create().addRequest(request1).request().get(0);
-final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
-        Selectable select = lastpagea.select(Selectors.regex("pn=(\\d+)", 1));
-        return select.getInt() / 50;
-        }
+    SurfSpider.startPagination(new PaginationClz() {
+            @Override
+            public int getPageCount() {
+                final SurfHttpRequest request1 = new SurfHttpRequest();
+                request1.setUrl("http://tieba.baidu.com/f?kw=java&fr=index");
+                request1.setMethod("get");
+                final Page request = SurfSpider.create().addRequest(request1).request().get(0);
+                final Selectable lastpagea = request.getHtml().select(Selectors.$("a.pagination-item:last-of-type", "href"));
+                        Selectable select = lastpagea.select(Selectors.regex("pn=(\\d+)", 1));
+                        return select.getInt() / 50;
+            }
+    
+            @Override
+            public SurfHttpRequest getPageUrl(int page) {
+                    return SurfHttpRequestBuilder.create("https://tieba.baidu.com/f?kw=java&amp;ie=utf-8&pn=" + page * 50, "GET").build();
+            }
+    
+            @Override
+            public HandlePage handlePage() {
+                return new HandlePage() {
+                @Override
+                public void process(Page page, int currentPage) {
+                    logger.info("当前页：" + currentPage);
+                    List<Tiezi> tiezis = page.getHtml().toList(new TieziConverter(Selectors.$(".j_thread_list")));
+                    Exporters.CONSOLE.exportList(tiezis, "title", "author", "url");
+                }
+    
+                @Override
+                public void processError(Page page, int currentPage) {
+                
+                    }
+                };
+            }
+    
+            @Override
+            public SurfSpider surfSpider() {
+                    return SurfSpider.create();
+             }
+    });
 
-@Override
-public SurfHttpRequest getPageUrl(int page) {
-        return SurfHttpRequestBuilder.create("https://tieba.baidu.com/f?kw=java&amp;ie=utf-8&pn=" + page * 50, "GET").build();
-        }
-
-@Override
-public HandlePage handlePage() {
-        return new HandlePage() {
-@Override
-public void process(Page page, int currentPage) {
-        logger.info("当前页：" + currentPage);
-        List<Tiezi> tiezis = page.getHtml().toList(new TieziConverter(Selectors.$(".j_thread_list")));
-        Exporters.CONSOLE.exportList(tiezis, "title", "author", "url");
-        }
-
-@Override
-public void processError(Page page, int currentPage) {
-
-        }
-        };
-        }
-
-@Override
-public SurfSpider surfSpider() {
-        return SurfSpider.create();
-        }
-        });
-        }
-
-        //阻塞主线程
-        for (Future<Page> future : futures) {
+    //阻塞主线程
+    for (Future<Page> future : futures) {
         future.get();
-        }
+    }
 ```
 
 # 同步请求
