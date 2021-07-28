@@ -95,9 +95,9 @@ page.getHtml().select(Selectors.$("a", "href")
 
 ```
 
-# 多线程并发爬取分页
+# 分页爬取
 
-一次爬5页百度贴吧，并打印帖子主题。
+遍历百度贴吧，并打印帖子主题，线程数为5。
 
 ```java
 SurfSpider.startPagination(new PaginationClz() {
@@ -135,7 +135,7 @@ SurfSpider.startPagination(new PaginationClz() {
 
         @Override
         public SurfSpider surfSpider() {
-                return SurfSpider.create();
+                return SurfSpider.create().thread(5);
          }
 });
 
