@@ -27,7 +27,7 @@ public class Page {
 
     /**
      * 内部使用
-     * @param usedProxy
+     * @param usedProxy 使用的代理
      */
     public void _toUseProx(HttpProxy usedProxy) {
         this.usedProxy = usedProxy;

@@ -10,8 +10,8 @@ public interface LogUploader {
 
 	/**
 	 * 非200和异常情况都认为是错误的日志
-	 * @param type
-	 * @return
+	 * @param type 类型
+	 * @return 布尔值
 	 */
 	 default boolean isErrorLog(String type){
 	 	return type.equals(TYPE_PROCESS_ERROR) || type.contains("exception");

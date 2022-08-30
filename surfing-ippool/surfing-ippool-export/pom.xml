@@ -7,7 +7,7 @@
     <parent>
         <artifactId>surfing-ippool-parent</artifactId>
         <groupId>com.yilnz</groupId>
-        <version>0.1.13</version>
+        <version>0.1.14</version>
     </parent>
 
     <groupId>com.yilnz</groupId>

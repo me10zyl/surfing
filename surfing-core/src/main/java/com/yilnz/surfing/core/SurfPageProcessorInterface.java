@@ -7,8 +7,8 @@ public interface SurfPageProcessorInterface {
     void process(Page page);
 
 	/**
-	 * try times <= 0 (status code != 200)
-	 * @param page
+	 * try times &lt;= 0 (status code != 200)
+	 * @param page 页面
 	 */
 	void processError(Page page);
 }

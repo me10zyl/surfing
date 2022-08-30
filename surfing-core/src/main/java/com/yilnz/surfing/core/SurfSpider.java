@@ -70,7 +70,7 @@ public class SurfSpider {
 	 * 阻塞型请求 - GET
 	 *
 	 * @param url 请求地址
-	 * @return
+	 * @return Page
 	 */
 	public static Page get(String url) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -82,7 +82,9 @@ public class SurfSpider {
 	/**
 	 * 阻塞型请求 - GET
 	 *
-	 * @return
+	 * @param url 地址
+	 * @param reLogin 重登请求
+	 * @return Page
 	 */
 	public static Page getWithLogin(String url, ReLogin reLogin) {
 		final SurfHttpRequest surfHttpRequest = new SurfHttpRequest();
@@ -110,6 +112,7 @@ public class SurfSpider {
 	 * @param threadnum             最大线程数
 	 * @param fileDownloadProcessor 文件下载完成回调
 	 * @param urls                  多个请求地址
+	 * @return 下载的页面
 	 */
 	public static List<Future<DownloadFile>> downloadBatch(String basePath, int threadnum, FileDownloadProcessor fileDownloadProcessor, String... urls) {
 		List<SurfHttpRequest> requests = new ArrayList<>();
@@ -270,7 +273,7 @@ public class SurfSpider {
 	 *
 	 * 阻塞型请求 - 开始爬取
 	 *
-	 * @return {@link List<Page>}
+	 * @return 页面
 	 */
 	public List<Page> request() {
 		final List<Future<Page>> start = start();
@@ -309,6 +312,7 @@ public class SurfSpider {
 
 	/**
 	 * 非阻塞型请求 - 开始爬取
+	 * @return 页面
 	 */
 	public List<Future<Page>> start() {
 		if (requests.size() == 0) {
@@ -329,14 +333,14 @@ public class SurfSpider {
 		if (downloader == null) {
 			downloader = new SurfHttpDownloader(requests, threadnum, pageProcessor, site, this.proxy, this.proxyProvider, this.reLogin);
 
-			//JMX监控
-			try {
+			//JMX监控 temporary removed
+			/*try {
 				MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 				ObjectName name = new ObjectName(String.format("spiderHttpStatusMBean-%s:name=spiderHttpStatus", this.hashCode()));
 				server.registerMBean(new SpiderHttpStatus((SurfHttpDownloader) downloader), name);
 			} catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
 				logger.error("[surfing]register jmx monitor error", e);
-			}
+			}*/
 
 		}
 		final List<Future<Page>> pages = downloader.downloads();

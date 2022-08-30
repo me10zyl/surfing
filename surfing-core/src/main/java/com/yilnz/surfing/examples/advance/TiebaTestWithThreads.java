@@ -10,7 +10,7 @@ import com.yilnz.surfing.core.selectors.Selectors;
 public class TiebaTestWithThreads {
 	/**
 	 * 每次爬 5 页
-	 * @param args
+	 * @param args 参数
 	 */
 	public static void main(String[] args) {
 		final SurfHttpRequest request1 = new SurfHttpRequest();

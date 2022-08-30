@@ -10,8 +10,9 @@ public interface HandlePage {
 	void process(Page page, int currentPage);
 
 	/**
-	 * try times <= 0 (status code != 200)
-	 * @param page
+	 * try times &lt;= 0 (status code != 200)
+	 * @param page 页面
+* @param currentPage 当前页
 	 */
 	void processError(Page page, int currentPage);
 }
