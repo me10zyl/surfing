@@ -68,17 +68,17 @@ public class SurfHttpClient {
         this.proxyProvider = proxyProvider;
     }
 
-    public Page post(SurfHttpRequest request){
+    public Page post(SurfHttpRequest request) {
         request.setMethod("POST");
         return request(request);
     }
 
-    public Page get(SurfHttpRequest request){
+    public Page get(SurfHttpRequest request) {
         request.setMethod("GET");
         return request(request);
     }
 
-    public Page request(SurfHttpRequest request){
+    public Page request(SurfHttpRequest request) {
         final RequestConfig.Builder custom = RequestConfig.custom();
         if (request.isIgnoreCookie()) {
             custom.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
@@ -93,33 +93,32 @@ public class SurfHttpClient {
         final HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(globalConfig);
         boolean useProxy = false;
         if (proxy != null) {
-            if(proxy == HttpProxy.RANDOM_PROXY){
+            if (proxy == HttpProxy.RANDOM_PROXY) {
                 proxy = IPPool.randomProxy();
             }
             httpClientBuilder.setProxy(proxy._getHttpHost());
             useProxy = true;
         }
         if (proxyProvider != null) {
-            if(proxyProvider.getProxy() == HttpProxy.RANDOM_PROXY){
+            if (proxyProvider.getProxy() == HttpProxy.RANDOM_PROXY) {
                 proxy = IPPool.randomProxy();
-            }else{
+            } else {
                 proxy = proxyProvider.getProxy();
             }
             httpClientBuilder.setProxy(proxy._getHttpHost());
             useProxy = true;
         }
-        if(useProxy){
+        if (useProxy) {
             logger.info("[surfing]使用代理:" + proxy._getHttpHost());
         }
-        final CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
         Page page = new Page();
         page.setUrl(request.getUrl());
         page.setHtml(new Html(""));
         page._toUseProx(proxy);
-        if(request.getMethod() == null){
+        if (request.getMethod() == null) {
             request.setMethod("GET");
         }
-        try {
+        try (final CloseableHttpClient closeableHttpClient = httpClientBuilder.build()) {
             final HttpEntityEnclosingRequestBase requests = new HttpEntityEnclosingRequestBase() {
                 @Override
                 public String getMethod() {
@@ -128,7 +127,7 @@ public class SurfHttpClient {
             };
 
             String url = request.getUrl();
-            if(!request.getParams().isEmpty()){
+            if (!request.getParams().isEmpty()) {
                 url += "?" + getParamsStr(request.getParams());
             }
             requests.setURI(URI.create(url));
@@ -136,13 +135,13 @@ public class SurfHttpClient {
                 requests.setHeader(entry.getKey(), entry.getValue());
             }
             String body = request.getBody();
-            if(body == null && !request.getBodyParams().isEmpty()){
+            if (body == null && !request.getBodyParams().isEmpty()) {
                 body = getParamsStr(request.getBodyParams());
                 requests.setEntity(new StringEntity(body));
-            }else if(body != null){
+            } else if (body != null) {
                 requests.setEntity(new StringEntity(body, StandardCharsets.UTF_8));
             }
-            requestInternal(page,closeableHttpClient, requests);
+            requestInternal(page, closeableHttpClient, requests);
         } catch (IOException e) {
             logger.error("surf http client error", e);
         }
@@ -152,27 +151,27 @@ public class SurfHttpClient {
 
     private String getParamsStr(final Map<String, String> params) throws IOException {
         final List<NameValuePair> formparams = new ArrayList<>();
-        params.forEach((e,v)->{
+        params.forEach((e, v) -> {
             formparams.add(new BasicNameValuePair(e, v));
         });
         return EntityUtils.toString(new UrlEncodedFormEntity(formparams, "UTF-8"));
     }
 
     private void requestInternal(Page page, CloseableHttpClient closeableHttpClient, HttpUriRequest requests) throws IOException {
-        final CloseableHttpResponse response = closeableHttpClient.execute(requests);
-        final Header encoding = response.getFirstHeader("content-encoding");
-        HttpEntity entity;
-        if(encoding != null && encoding.getValue().equals("gzip")){
-            entity = new GzipDecompressingEntity(response.getEntity());
-        } else if(encoding != null && encoding.getValue().equals("deflate")){
-            entity = new DeflateDecompressingEntity(response.getEntity());
-        } else if(encoding != null && encoding.getValue().equals("br")){
-            entity = new BrotliDecompressingEntity(response.getEntity());
-        } else{
-            entity = response.getEntity();
-            //logger.info("[surfing]ContentEncoding:"+ encoding);
+        try (final CloseableHttpResponse response = closeableHttpClient.execute(requests)) {
+            final Header encoding = response.getFirstHeader("content-encoding");
+            HttpEntity entity;
+            if (encoding != null && encoding.getValue().equals("gzip")) {
+                entity = new GzipDecompressingEntity(response.getEntity());
+            } else if (encoding != null && encoding.getValue().equals("deflate")) {
+                entity = new DeflateDecompressingEntity(response.getEntity());
+            } else if (encoding != null && encoding.getValue().equals("br")) {
+                entity = new BrotliDecompressingEntity(response.getEntity());
+            } else {
+                entity = response.getEntity();
+                //logger.info("[surfing]ContentEncoding:"+ encoding);
 
-        }
+            }
       /*  final InputStream inputStream = entity.getContent();
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String str;
@@ -180,12 +179,13 @@ public class SurfHttpClient {
         while((str = bufferedReader.readLine()) != null){
             result.append(str);
         }*/
-        final int statusCode = response.getStatusLine().getStatusCode();
-        page.setStatusCode(statusCode);
-        page.setHtml(new Html(EntityUtils.toString(entity)));
-        final Header[] allHeaders = response.getAllHeaders();
-        for (Header h : allHeaders) {
-            page.getHeaders().add(new com.yilnz.surfing.core.basic.Header(h.getName(), h.getValue()));
+            final int statusCode = response.getStatusLine().getStatusCode();
+            page.setStatusCode(statusCode);
+            page.setHtml(new Html(EntityUtils.toString(entity)));
+            final Header[] allHeaders = response.getAllHeaders();
+            for (Header h : allHeaders) {
+                page.getHeaders().add(new com.yilnz.surfing.core.basic.Header(h.getName(), h.getValue()));
+            }
         }
     }
 }
