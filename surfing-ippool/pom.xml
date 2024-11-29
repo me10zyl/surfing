@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.2.9</logback.version>
         <curator.version>2.10.0</curator.version>
     </properties>
 
