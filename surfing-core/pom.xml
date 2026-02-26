@@ -13,9 +13,6 @@
     <artifactId>surfing</artifactId>
     <version>0.1.16</version>
 
-    <properties>
-        <repoAddr>private_maven_repo_url</repoAddr>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -154,19 +151,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>local</id>
-            <distributionManagement>
-                <repository>
-                    <id>releases</id>
-                    <name>Releases</name>
-                    <url>http://${repoAddr}/nexus/content/repositories/releases</url>
-                </repository>
-            </distributionManagement>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
         <profile>
             <id>sonatype-oss-release</id>
             <build>
