@@ -46,6 +46,8 @@ public class SurfHttpClient {
 
     private Logger logger = LoggerFactory.getLogger(SurfHttpClient.class);
 
+    public static final int DEFAULT_CONNECT_TIMEOUT = 3000;
+
     private HttpProxy proxy;
 
     public HttpProxy getProxy() {
@@ -84,9 +86,13 @@ public class SurfHttpClient {
             custom.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
         }
         if (request.getConnectTimeout() != null) {
-            custom.setSocketTimeout(Math.toIntExact(request.getConnectTimeout()));
-            custom.setConnectTimeout(Math.toIntExact(request.getConnectTimeout()));
-            custom.setConnectionRequestTimeout(Math.toIntExact(request.getConnectTimeout()));
+            custom.setSocketTimeout(Math.toIntExact(request.getConnectTimeout())); //读取超时时间
+            custom.setConnectTimeout(Math.toIntExact(request.getConnectTimeout())); //tcp链接超时时间
+            custom.setConnectionRequestTimeout(Math.toIntExact(request.getConnectTimeout())); // 线程池等待超时
+        } else {
+            custom.setSocketTimeout(DEFAULT_CONNECT_TIMEOUT); //读取超时时间
+            custom.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT); //tcp链接超时时间
+            custom.setConnectionRequestTimeout(DEFAULT_CONNECT_TIMEOUT); // 线程池等待超时
         }
         RequestConfig globalConfig = custom.build();
         //final HttpClientBuilder builder = HttpClientBuilder.create();
